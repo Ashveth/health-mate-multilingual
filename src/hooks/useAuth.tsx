@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useRateLimit } from '@/hooks/useRateLimit';
 
 interface AuthContextType {
   user: User | null;
@@ -21,6 +22,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  
+  // Rate limiting for authentication attempts
+  const signInRateLimit = useRateLimit({
+    maxAttempts: 5,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    blockDurationMs: 30 * 60 * 1000, // 30 minutes
+  });
+  
+  const signUpRateLimit = useRateLimit({
+    maxAttempts: 3,
+    windowMs: 60 * 60 * 1000, // 1 hour
+    blockDurationMs: 60 * 60 * 1000, // 1 hour
+  });
 
   useEffect(() => {
     // Set up auth state listener
@@ -49,6 +63,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [toast]);
 
   const signUp = async (email: string, password: string, fullName: string, phoneNumber?: string) => {
+    if (!signUpRateLimit.checkRateLimit()) {
+      toast({
+        title: "Too Many Attempts",
+        description: "Please wait before trying to create another account.",
+        variant: "destructive",
+      });
+      return { error: new Error("Rate limit exceeded") };
+    }
+    
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
@@ -80,6 +103,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
+    if (!signInRateLimit.checkRateLimit()) {
+      toast({
+        title: "Too Many Attempts",
+        description: "Please wait before trying to sign in again.",
+        variant: "destructive",
+      });
+      return { error: new Error("Rate limit exceeded") };
+    }
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,

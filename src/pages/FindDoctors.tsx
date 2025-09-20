@@ -14,8 +14,8 @@ interface Doctor {
   id: string;
   name: string;
   specialty: string;
-  phone: string;
-  email: string;
+  phone?: string;
+  email?: string;
   address: string;
   latitude: number;
   longitude: number;
@@ -23,6 +23,7 @@ interface Doctor {
   experience_years: number;
   consultation_fee: number;
   availability_hours: string;
+  can_view_contact: boolean;
   distance?: number;
 }
 
@@ -92,24 +93,42 @@ export default function FindDoctors() {
     }
     
     try {
-      const { data, error } = await supabase
+      // Get all doctor IDs first
+      const { data: doctorIds, error: idsError } = await supabase
         .from('doctors')
-        .select('*');
+        .select('id, latitude, longitude');
 
-      if (error) throw error;
+      if (idsError) throw idsError;
 
-      // Calculate distances and sort by proximity
-      const doctorsWithDistance = data.map(doctor => ({
-        ...doctor,
-        distance: calculateDistance(
-          location.lat,
-          location.lng,
-          doctor.latitude,
-          doctor.longitude
-        )
-      })).sort((a, b) => a.distance - b.distance);
+      // Fetch secure doctor info for each doctor
+      const doctorsWithInfo = await Promise.all(
+        doctorIds.map(async (doctor) => {
+          const { data, error } = await supabase
+            .rpc('get_doctor_info', { doctor_uuid: doctor.id });
+          
+          if (error) {
+            console.error('Error fetching doctor info:', error);
+            return null;
+          }
+          
+          return data?.[0] ? {
+            ...data[0],
+            distance: calculateDistance(
+              location.lat,
+              location.lng,
+              doctor.latitude,
+              doctor.longitude
+            )
+          } : null;
+        })
+      );
 
-      setDoctors(doctorsWithDistance);
+      // Filter out null values and sort by distance
+      const validDoctors = doctorsWithInfo
+        .filter(doctor => doctor !== null)
+        .sort((a, b) => (a?.distance || 0) - (b?.distance || 0));
+
+      setDoctors(validDoctors);
     } catch (error) {
       console.error('Error fetching doctors:', error);
       toast({
@@ -128,12 +147,31 @@ export default function FindDoctors() {
     }
     
     try {
-      const { data, error } = await supabase
+      // Get all doctor IDs first
+      const { data: doctorIds, error: idsError } = await supabase
         .from('doctors')
-        .select('*');
+        .select('id');
 
-      if (error) throw error;
-      setDoctors(data || []);
+      if (idsError) throw idsError;
+
+      // Fetch secure doctor info for each doctor
+      const doctorsWithInfo = await Promise.all(
+        doctorIds.map(async (doctor) => {
+          const { data, error } = await supabase
+            .rpc('get_doctor_info', { doctor_uuid: doctor.id });
+          
+          if (error) {
+            console.error('Error fetching doctor info:', error);
+            return null;
+          }
+          
+          return data?.[0] || null;
+        })
+      );
+
+      // Filter out null values
+      const validDoctors = doctorsWithInfo.filter(doctor => doctor !== null);
+      setDoctors(validDoctors);
     } catch (error) {
       console.error('Error fetching doctors:', error);
       toast({
@@ -163,8 +201,16 @@ export default function FindDoctors() {
     });
   };
 
-  const handleCallDoctor = (phone: string) => {
-    window.open(`tel:${phone}`, '_self');
+  const handleCallDoctor = (doctor: Doctor) => {
+    if (!doctor.phone || !doctor.can_view_contact) {
+      toast({
+        title: "Contact Restricted",
+        description: "Phone number is only available after booking an appointment.",
+        variant: "destructive",
+      });
+      return;
+    }
+    window.open(`tel:${doctor.phone}`, '_self');
   };
 
   return (
