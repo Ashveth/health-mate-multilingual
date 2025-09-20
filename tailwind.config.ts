@@ -73,6 +73,11 @@ export default {
       transitionTimingFunction: {
         "smooth": "var(--transition-smooth)",
       },
+      fontFamily: {
+        'inter': ['Inter', 'sans-serif'],
+        'poppins': ['Poppins', 'sans-serif'],
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
