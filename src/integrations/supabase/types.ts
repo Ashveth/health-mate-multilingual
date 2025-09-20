@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          created_at: string
+          doctor_id: string
+          id: string
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          created_at?: string
+          doctor_id: string
+          id?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string
@@ -80,6 +124,90 @@ export type Database = {
           reported_at?: string
           severity?: string
           source?: string | null
+        }
+        Relationships: []
+      }
+      doctors: {
+        Row: {
+          address: string
+          availability_hours: string | null
+          consultation_fee: number | null
+          created_at: string
+          email: string | null
+          experience_years: number | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          phone: string | null
+          rating: number | null
+          specialty: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          availability_hours?: string | null
+          consultation_fee?: number | null
+          created_at?: string
+          email?: string | null
+          experience_years?: number | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          phone?: string | null
+          rating?: number | null
+          specialty: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          availability_hours?: string | null
+          consultation_fee?: number | null
+          created_at?: string
+          email?: string | null
+          experience_years?: number | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          phone?: string | null
+          rating?: number | null
+          specialty?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      emergency_contacts: {
+        Row: {
+          contact_type: string
+          created_at: string
+          id: string
+          name: string
+          phone_number: string
+          relationship: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_type: string
+          created_at?: string
+          id?: string
+          name: string
+          phone_number: string
+          relationship?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_type?: string
+          created_at?: string
+          id?: string
+          name?: string
+          phone_number?: string
+          relationship?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
