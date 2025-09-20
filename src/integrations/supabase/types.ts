@@ -284,7 +284,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_doctor_info: {
+        Args: { doctor_uuid: string }
+        Returns: {
+          address: string
+          availability_hours: string
+          can_view_contact: boolean
+          consultation_fee: number
+          created_at: string
+          email: string
+          experience_years: number
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          phone: string
+          rating: number
+          specialty: string
+          updated_at: string
+        }[]
+      }
+      user_has_appointment_with_doctor: {
+        Args: { doctor_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

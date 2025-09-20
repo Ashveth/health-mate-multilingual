@@ -46,6 +46,26 @@ serve(async (req) => {
   try {
     const { message, conversationHistory = [], userLanguage = 'en' } = await req.json();
 
+    // Input validation for security
+    if (!message || typeof message !== 'string') {
+      throw new Error('Invalid message format');
+    }
+    
+    if (message.length > 1000) {
+      throw new Error('Message too long. Please keep messages under 1000 characters.');
+    }
+    
+    if (typeof userLanguage !== 'string' || !['en', 'hi', 'es', 'fr'].includes(userLanguage)) {
+      throw new Error('Invalid language selection');
+    }
+    
+    if (!Array.isArray(conversationHistory)) {
+      throw new Error('Invalid conversation history format');
+    }
+
+    // Sanitize message input
+    const sanitizedMessage = message.trim().replace(/[<>]/g, '');
+
     // Build context-aware system prompt with medical knowledge
     const systemPrompt = `You are AI HealthMate, a multilingual AI health assistant. 
     
@@ -71,7 +91,7 @@ Current conversation language: ${userLanguage}`;
         role: msg.role,
         content: msg.content
       })),
-      { role: 'user', content: message }
+      { role: 'user', content: sanitizedMessage }
     ];
 
     console.log('Sending request to Claude API with', messages.length, 'messages');

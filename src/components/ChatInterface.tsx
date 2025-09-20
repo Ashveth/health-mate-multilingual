@@ -30,7 +30,18 @@ export const ChatInterface = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || isLoading) return;
+
+    // Client-side input validation
+    if (inputMessage.length > 1000) {
+      const { toast } = await import('@/hooks/use-toast');
+      toast({
+        title: "Message too long",
+        description: "Please keep your message under 1000 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
