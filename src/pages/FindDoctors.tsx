@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Doctor {
   id: string;
@@ -26,6 +27,7 @@ interface Doctor {
 }
 
 export default function FindDoctors() {
+  const { user } = useAuth();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -80,6 +82,15 @@ export default function FindDoctors() {
   };
 
   const fetchNearbyDoctors = async (location: { lat: number; lng: number }) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to view doctor information.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       const { data, error } = await supabase
         .from('doctors')
@@ -112,6 +123,10 @@ export default function FindDoctors() {
   };
 
   const fetchAllDoctors = async () => {
+    if (!user) {
+      return; // Don't fetch if user is not authenticated
+    }
+    
     try {
       const { data, error } = await supabase
         .from('doctors')
@@ -130,8 +145,10 @@ export default function FindDoctors() {
   };
 
   useEffect(() => {
-    fetchAllDoctors();
-  }, []);
+    if (user) {
+      fetchAllDoctors();
+    }
+  }, [user]);
 
   const filteredDoctors = doctors.filter(doctor =>
     doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -152,129 +169,88 @@ export default function FindDoctors() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-4"
-      >
-        <h1 className="text-3xl font-bold font-poppins text-primary">
-          {t('doctors.find_nearby')}
-        </h1>
-        
-        {!userLocation && (
-          <div className="bg-primary-light/10 p-4 rounded-lg border border-primary-light/20">
-            <p className="text-muted-foreground mb-4">
-              {t('doctors.location_access')}
-            </p>
-            <Button 
-              onClick={requestLocationPermission}
-              disabled={loading}
-              className="bg-gradient-primary"
-            >
-              <MapPin className="w-4 h-4 mr-2" />
-              {loading ? t('common.loading') : t('doctors.enable_location')}
-            </Button>
-          </div>
-        )}
-
-        <div className="max-w-md mx-auto">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder={t('common.search')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-      </motion.div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredDoctors.map((doctor, index) => (
+      {!user ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4 py-12"
+        >
+          <h1 className="text-3xl font-bold font-poppins text-primary">
+            {t('doctors.find_nearby')}
+          </h1>
+          <Card className="max-w-md mx-auto">
+            <CardContent className="p-6">
+              <p className="text-muted-foreground mb-4">
+                {t('auth.login_required')}
+              </p>
+              <Button 
+                onClick={() => window.location.href = '/auth'}
+                className="bg-gradient-primary"
+              >
+                {t('auth.sign_in')}
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ) : (
+        <>
           <motion.div
-            key={doctor.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+            className="text-center space-y-4"
           >
-            <Card className="h-full hover:shadow-medical transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center">
-                      <User className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg font-semibold">
-                        {doctor.name}
-                      </CardTitle>
-                      <Badge variant="secondary" className="text-xs">
-                        {doctor.specialty}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                    <span className="text-sm font-medium">{doctor.rating}</span>
-                  </div>
-                </div>
-              </CardHeader>
+            <h1 className="text-3xl font-bold font-poppins text-primary">
+              {t('doctors.find_nearby')}
+            </h1>
+            
+            {!userLocation && (
+              <div className="bg-primary-light/10 p-4 rounded-lg border border-primary-light/20">
+                <p className="text-muted-foreground mb-4">
+                  {t('doctors.location_access')}
+                </p>
+                <Button 
+                  onClick={requestLocationPermission}
+                  disabled={loading}
+                  className="bg-gradient-primary"
+                >
+                  <MapPin className="w-4 h-4 mr-2" />
+                  {loading ? t('common.loading') : t('doctors.enable_location')}
+                </Button>
+              </div>
+            )}
 
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span className="truncate">{doctor.address}</span>
-                  {doctor.distance && (
-                    <Badge variant="outline" className="ml-auto">
-                      {doctor.distance.toFixed(1)} km
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>{doctor.experience_years} {t('doctors.experience')}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <DollarSign className="w-4 h-4" />
-                  <span>{t('doctors.consultation_fee')}: ₹{doctor.consultation_fee}</span>
-                </div>
-
-                <div className="text-xs text-muted-foreground">
-                  {doctor.availability_hours}
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCallDoctor(doctor.phone)}
-                    className="flex-1"
-                  >
-                    <Phone className="w-4 h-4 mr-1" />
-                    {t('common.call')}
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => handleBookAppointment(doctor)}
-                    className="flex-1 bg-gradient-primary"
-                  >
-                    {t('doctors.book_appointment')}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="max-w-md mx-auto">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder={t('common.search')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
           </motion.div>
-        ))}
-      </div>
 
-      {filteredDoctors.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <User className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">No doctors found matching your search.</p>
-        </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{filteredDoctors.map((doctor, index) => (
+            <motion.div
+              key={doctor.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+...
+            </motion.div>
+          ))}
+          </div>
+
+          {filteredDoctors.length === 0 && !loading && (
+            <div className="text-center py-12">
+              <User className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No doctors found matching your search.</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
