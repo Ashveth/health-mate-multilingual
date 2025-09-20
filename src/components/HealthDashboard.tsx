@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { DiseaseOutbreakAlert } from "@/components/DiseaseOutbreakAlert";
 import heroImage from "@/assets/hero-medical.jpg";
 import healthIcons from "@/assets/health-icons.jpg";
 import doctorFemale from "@/assets/doctor-female.jpg";
@@ -60,6 +61,9 @@ const healthTips = [
 export const HealthDashboard = () => {
   return (
     <div className="space-y-8 font-inter">
+      {/* Disease Outbreak Alerts */}
+      <DiseaseOutbreakAlert />
+      
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
