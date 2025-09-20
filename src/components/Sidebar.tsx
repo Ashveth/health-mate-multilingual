@@ -182,6 +182,7 @@ export const Sidebar = ({ activeView, onViewChange }: SidebarProps) => {
                 "w-full justify-start text-left p-3 h-auto hover:bg-accent-light/10",
                 isCollapsed && "justify-center px-3"
               )}
+              onClick={() => onViewChange("settings")}
             >
               <Settings className={cn(
                 "w-5 h-5 flex-shrink-0",

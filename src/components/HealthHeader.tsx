@@ -1,11 +1,19 @@
 import { motion } from "framer-motion";
-import { Heart, Shield, Users, Calendar, LogOut } from "lucide-react";
+import { Heart, Shield, Users, Calendar, LogOut, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const HealthHeader = () => {
-  const { user, signOut } = useAuth();
+  const { signOut, user } = useAuth();
 
   return (
     <header className="bg-gradient-bg border-b border-primary-light/20">
@@ -36,19 +44,39 @@ export const HealthHeader = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex items-center gap-3"
           >
-            <Badge className="bg-primary-light text-primary-dark border-primary-light">
-              <Shield className="w-3 h-3 mr-1" />
-              Secure & Private
-            </Badge>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={signOut}
-              className="hover:bg-destructive hover:text-destructive-foreground transition-colors"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
+            <LanguageSelector />
+            
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="w-4 h-4" />
+              <Badge className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center p-0 text-xs">
+                3
+              </Badge>
             </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2 hover:bg-primary-light/10">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src="" />
+                    <AvatarFallback className="bg-gradient-primary text-white font-medium">
+                      {user?.email?.charAt(0).toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden md:inline text-sm font-medium">
+                    {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Help & Support</DropdownMenuItem>
+                <DropdownMenuItem className="text-red-600" onClick={signOut}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </motion.div>
         </div>
 

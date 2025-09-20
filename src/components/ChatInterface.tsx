@@ -43,17 +43,33 @@ export const ChatInterface = () => {
     setInputMessage('');
     setIsLoading(true);
 
-    // Simulate AI response (will be replaced with actual Claude API)
-    setTimeout(() => {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase.functions.invoke('chat-with-claude', {
+        body: { message: inputMessage }
+      });
+
+      if (error) throw error;
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: 'I understand your concern. Let me help you with that health query. Based on medical knowledge, I recommend...',
+        content: data.response || 'I apologize, but I encountered an issue processing your request. Please try again.',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error calling Claude API:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: 'I apologize, but I\'m having trouble connecting right now. Please check your connection and try again.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const toggleListening = () => {
