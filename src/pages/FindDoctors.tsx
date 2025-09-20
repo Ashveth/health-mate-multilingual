@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { AppointmentBooking } from '@/components/AppointmentBooking';
 import { useAuth } from '@/hooks/useAuth';
 
 interface Doctor {
@@ -33,6 +34,8 @@ export default function FindDoctors() {
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [showBooking, setShowBooking] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -194,11 +197,8 @@ export default function FindDoctors() {
   );
 
   const handleBookAppointment = (doctor: Doctor) => {
-    // Navigate to appointment booking (implement this)
-    toast({
-      title: "Booking Appointment",
-      description: `Redirecting to book appointment with ${doctor.name}`,
-    });
+    setSelectedDoctor(doctor);
+    setShowBooking(true);
   };
 
   const handleCallDoctor = (doctor: Doctor) => {
@@ -297,6 +297,24 @@ export default function FindDoctors() {
             </div>
           )}
         </>
+      )}
+      
+      {selectedDoctor && (
+        <AppointmentBooking
+          doctor={selectedDoctor}
+          isOpen={showBooking}
+          onClose={() => {
+            setShowBooking(false);
+            setSelectedDoctor(null);
+          }}
+          onSuccess={() => {
+            // Optionally refresh appointments or navigate
+            toast({
+              title: "Success",
+              description: "Appointment booked successfully!"
+            });
+          }}
+        />
       )}
     </div>
   );

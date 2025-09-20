@@ -1,0 +1,209 @@
+import React, { useState } from 'react';
+import { Calendar, Clock, User, Phone, Mail, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+
+interface Doctor {
+  id: string;
+  name: string;
+  specialty: string;
+  consultation_fee: number;
+  availability_hours: string;
+}
+
+interface AppointmentBookingProps {
+  doctor: Doctor;
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export function AppointmentBooking({ doctor, isOpen, onClose, onSuccess }: AppointmentBookingProps) {
+  const [formData, setFormData] = useState({
+    appointment_date: '',
+    appointment_time: '',
+    notes: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to book an appointment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .insert({
+          user_id: user.id,
+          doctor_id: doctor.id,
+          appointment_date: formData.appointment_date,
+          appointment_time: formData.appointment_time,
+          notes: formData.notes,
+          status: 'scheduled'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Appointment Booked!",
+        description: `Your appointment with ${doctor.name} has been scheduled.`,
+      });
+
+      onSuccess();
+      onClose();
+      
+      // Reset form
+      setFormData({
+        appointment_date: '',
+        appointment_time: '',
+        notes: ''
+      });
+      
+    } catch (error) {
+      console.error('Error booking appointment:', error);
+      toast({
+        title: "Booking Failed",
+        description: "Failed to book appointment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Generate available time slots
+  const timeSlots = [
+    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
+  ];
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5" />
+            Book Appointment
+          </DialogTitle>
+        </DialogHeader>
+
+        <Card className="border-0 shadow-none">
+          <CardHeader className="px-0 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center">
+                <User className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold">{doctor.name}</h3>
+                <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+                <p className="text-sm font-medium text-primary">
+                  ₹{doctor.consultation_fee} consultation fee
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="px-0">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="date">Appointment Date</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={formData.appointment_date}
+                    onChange={(e) => handleInputChange('appointment_date', e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="time">Appointment Time</Label>
+                  <Select 
+                    value={formData.appointment_time} 
+                    onValueChange={(value) => handleInputChange('appointment_time', value)}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select time" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {timeSlots.map((time) => (
+                        <SelectItem key={time} value={time}>
+                          {time}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes">Notes (Optional)</Label>
+                <Textarea
+                  id="notes"
+                  placeholder="Describe your symptoms or reason for visit..."
+                  value={formData.notes}
+                  onChange={(e) => handleInputChange('notes', e.target.value)}
+                  className="min-h-[80px]"
+                />
+              </div>
+
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Available Hours:</strong> {doctor.availability_hours}
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="flex-1 bg-gradient-primary"
+                >
+                  {isLoading ? 'Booking...' : 'Confirm Booking'}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={onClose}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </DialogContent>
+    </Dialog>
+  );
+}

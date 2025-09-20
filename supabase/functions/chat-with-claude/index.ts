@@ -55,7 +55,7 @@ serve(async (req) => {
       throw new Error('Message too long. Please keep messages under 1000 characters.');
     }
     
-    if (typeof userLanguage !== 'string' || !['en', 'hi', 'es', 'fr'].includes(userLanguage)) {
+    if (typeof userLanguage !== 'string' || !['en', 'hi', 'es', 'fr', 'ta', 'te', 'kn', 'bn', 'mr', 'gu', 'ml', 'pa'].includes(userLanguage)) {
       throw new Error('Invalid language selection');
     }
     
@@ -71,11 +71,13 @@ serve(async (req) => {
     
 Key Guidelines:
 - Respond in ${userLanguage === 'en' ? 'English' : 'the user\'s preferred language'}
-- Provide accurate health information based on medical knowledge
+- Provide accurate, personalized health information based on medical knowledge
 - Always recommend consulting a doctor for serious symptoms
 - Include relevant precautions and preventive measures
 - Be empathetic and supportive
 - Use the medical knowledge graph data when relevant
+- Keep responses concise but informative
+- Focus on preventive care and wellness
 
 Medical Knowledge Available:
 ${JSON.stringify(medicalKnowledgeGraph, null, 2)}
@@ -87,7 +89,7 @@ Current conversation language: ${userLanguage}`;
     // Build conversation history for context
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...conversationHistory.map((msg: any) => ({
+      ...conversationHistory.slice(-10).map((msg: any) => ({
         role: msg.role,
         content: msg.content
       })),
@@ -104,10 +106,9 @@ Current conversation language: ${userLanguage}`;
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
-        messages: messages,
-        temperature: 0.7
+        messages: messages
       }),
     });
 
