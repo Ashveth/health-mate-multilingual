@@ -193,7 +193,8 @@ export default function FindDoctors() {
 
   const filteredDoctors = doctors.filter(doctor =>
     doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase())
+    doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    doctor.address.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleBookAppointment = (doctor: Doctor) => {
@@ -269,7 +270,7 @@ export default function FindDoctors() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
-                  placeholder={t('common.search')}
+                  placeholder="Search by name, specialization, or location..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -293,7 +294,16 @@ export default function FindDoctors() {
           {filteredDoctors.length === 0 && !loading && (
             <div className="text-center py-12">
               <User className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No doctors found matching your search.</p>
+              <h2 className="text-xl font-semibold mb-2">No doctors found</h2>
+              <p className="text-muted-foreground mb-4">
+                I couldn't find any doctors matching your request. Please try another search or contact support.
+              </p>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>💡 **Try searching for:**</p>
+                <p>• Specialization: "cardiologist", "pediatrician"</p>
+                <p>• Doctor name: "Dr. Smith"</p>
+                <p>• Location: "Mumbai", "Delhi"</p>
+              </div>
             </div>
           )}
         </>

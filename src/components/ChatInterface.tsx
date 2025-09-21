@@ -20,7 +20,7 @@ export const ChatInterface = () => {
     {
       id: '1',
       type: 'ai',
-      content: 'Hello! I\'m AI HealthMate, your personal health assistant. How can I help you today? (मैं आपकी कैसे सहायता कर सकता हूं?)',
+      content: 'Hello! I\'m AI HealthMate, your Public Health Assistant. 🏥\n\nI can help you with:\n• 📅 **Book appointments** - "Book appointment with cardiologist"\n• 🔍 **Find doctors** - "Find pediatrician near me"\n• 🚨 **Emergency help** - "Emergency" or "Ambulance"\n• 💬 **Health questions** - Ask about symptoms, treatments, wellness\n\nHow can I assist you today? (मैं आपकी कैसे सहायता कर सकता हूं?)',
       timestamp: new Date(),
       language: 'en-hi'
     }
@@ -55,22 +55,18 @@ export const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { data, error } = await supabase.functions.invoke('chat-with-claude', {
-        body: { message: inputMessage }
-      });
-
-      if (error) throw error;
-
+      // Handle specific chatbot workflows
+      const response = await handleChatbotWorkflow(inputMessage);
+      
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: data.response || 'I apologize, but I encountered an issue processing your request. Please try again.',
+        content: response,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
-      console.error('Error calling Claude API:', error);
+      console.error('Error in chatbot:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
@@ -80,6 +76,48 @@ export const ChatInterface = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleChatbotWorkflow = async (message: string): Promise<string> => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Health Records - HIPAA/GDPR Compliance
+    if (lowerMessage.includes('health record') || lowerMessage.includes('medical record') || lowerMessage.includes('health history')) {
+      return "For your safety, I cannot store or display health records. Please contact your healthcare provider directly for access to your medical records.";
+    }
+    
+    // Doctor Appointment Booking Workflow
+    if (lowerMessage.includes('book') && (lowerMessage.includes('appointment') || lowerMessage.includes('doctor'))) {
+      return "I'll help you book an appointment! Please tell me:\n\n1️⃣ **Doctor's name** or **specialization** (e.g., 'cardiologist', 'Dr. Smith')\n\nYou can also visit the 'Find Doctors' section to browse available doctors and book directly.";
+    }
+    
+    // Find Doctor Workflow
+    if (lowerMessage.includes('find doctor') || lowerMessage.includes('search doctor')) {
+      return "I can help you find doctors! Please specify:\n\n🔍 **Search by:**\n- Specialization (e.g., cardiologist, pediatrician)\n- Doctor's name\n- Location (city or area)\n\nExample: 'Find cardiologist in Mumbai' or 'Dr. Smith'\n\nYou can also use the 'Find Doctors' page for a complete search experience.";
+    }
+    
+    // Emergency Workflow
+    if (lowerMessage.includes('emergency') || lowerMessage.includes('ambulance') || lowerMessage.includes('urgent')) {
+      return "🚨 **EMERGENCY SERVICES**\n\n📞 **Ambulance**: 108\n📞 **Police**: 100\n📞 **Fire**: 101\n\nFor non-emergency help, you can:\n- Add emergency contacts in the Emergency section\n- Save your personal doctor's number\n- Add family members' contact information\n\n*If this is a medical emergency, please call 108 immediately.*";
+    }
+    
+    // Default to Claude API for general health questions
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase.functions.invoke('chat-with-claude', {
+        body: { 
+          message: message,
+          conversationHistory: messages.slice(-10) // Include recent context
+        }
+      });
+
+      if (error) throw error;
+
+      return data.response || 'I apologize, but I encountered an issue processing your request. Please try again.';
+    } catch (error) {
+      console.error('Error calling Claude API:', error);
+      return 'Sorry, I couldn\'t process your health question right now. Please try again later or contact support.';
     }
   };
 

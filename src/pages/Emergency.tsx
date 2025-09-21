@@ -61,8 +61,8 @@ export default function Emergency() {
     } catch (error) {
       console.error('Error fetching emergency contacts:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch emergency contacts.",
+        title: "Connection Error",
+        description: "Sorry, I couldn't load your emergency contacts right now. Please try again later or contact support.",
         variant: "destructive",
       });
     } finally {

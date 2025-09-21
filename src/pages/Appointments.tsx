@@ -55,8 +55,8 @@ export default function Appointments() {
     } catch (error) {
       console.error('Error fetching appointments:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch appointments.",
+        title: "Connection Error",
+        description: "Sorry, I couldn't fetch your appointments right now. Please try again later or contact support.",
         variant: "destructive",
       });
     } finally {

@@ -75,8 +75,8 @@ export default function Settings() {
     } catch (error) {
       console.error('Error fetching profile:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch profile data.",
+        title: "Connection Error",
+        description: "Sorry, I couldn't load your profile right now. Please try again later or contact support.",
         variant: "destructive",
       });
     } finally {
@@ -112,8 +112,8 @@ export default function Settings() {
     } catch (error) {
       console.error('Error saving profile:', error);
       toast({
-        title: "Error",
-        description: "Failed to save profile changes.",
+        title: "Save Failed",
+        description: "Sorry, I couldn't save your changes right now. Please try again later or contact support.",
         variant: "destructive",
       });
     } finally {
