@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, Plus, User, Trash2, Edit, AlertTriangle } from 'lucide-react';
+import { Phone, Plus, User, Trash2, Edit, AlertTriangle, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+import { EmergencyContactBooking } from '@/components/EmergencyContactBooking';
 
 interface EmergencyContact {
   id: string;
@@ -25,6 +26,7 @@ export default function Emergency() {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const [isAddingContact, setIsAddingContact] = useState(false);
   const [editingContact, setEditingContact] = useState<EmergencyContact | null>(null);
+  const [bookingContact, setBookingContact] = useState<EmergencyContact | null>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -356,6 +358,17 @@ export default function Emergency() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    {contact.contact_type === 'personal_doctor' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setBookingContact(contact)}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        <Calendar className="w-4 h-4 mr-1" />
+                        Book
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -402,6 +415,21 @@ export default function Emergency() {
             {t('emergency.add_contact')}
           </Button>
         </motion.div>
+      )}
+
+      {/* Emergency Contact Booking Dialog */}
+      {bookingContact && (
+        <EmergencyContactBooking
+          contact={bookingContact}
+          isOpen={!!bookingContact}
+          onClose={() => setBookingContact(null)}
+          onSuccess={() => {
+            toast({
+              title: "Success",
+              description: "Appointment reminder created successfully.",
+            });
+          }}
+        />
       )}
     </div>
   );
