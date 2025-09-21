@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Star, Clock, DollarSign, User, Search } from 'lucide-react';
+import { MapPin, Phone, Star, Clock, DollarSign, User, Search, Navigation, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -34,12 +34,14 @@ export default function FindDoctors() {
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [locationInput, setLocationInput] = useState('');
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [showBooking, setShowBooking] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
 
-  const requestLocationPermission = () => {
+  const requestLocationPermission = async () => {
     if (!navigator.geolocation) {
       toast({
         title: "Location not supported",
@@ -49,31 +51,43 @@ export default function FindDoctors() {
       return;
     }
 
-    setLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        setUserLocation(location);
-        fetchNearbyDoctors(location);
-      },
-      (error) => {
-        console.error('Location error:', error);
-        toast({
-          title: "Location access denied",
-          description: "Please enable location access to find nearby doctors.",
-          variant: "destructive",
+    setIsLoadingLocation(true);
+    
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 600000 // 10 minutes
         });
-        // Fetch all doctors even without location
-        fetchAllDoctors();
-        setLoading(false);
-      }
-    );
+      });
+      
+      const location = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+      
+      setUserLocation(location);
+      await fetchNearbyDoctors(location);
+      
+      toast({
+        title: "Location Access Granted",
+        description: "Now showing doctors near your location",
+      });
+    } catch (error) {
+      console.error('Location error:', error);
+      toast({
+        title: "Location access denied",
+        description: "Please enter your location manually to find nearby doctors.",
+        variant: "destructive",
+      });
+      await fetchAllDoctors();
+    } finally {
+      setIsLoadingLocation(false);
+    }
   };
 
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Radius of the Earth in kilometers
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -82,19 +96,56 @@ export default function FindDoctors() {
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c; // Distance in kilometers
+    const distance = R * c;
+    return Math.round(distance * 10) / 10; // Round to 1 decimal place
+  };
+
+  const geocodeLocation = async (location: string) => {
+    try {
+      // Using free Nominatim API for geocoding
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`);
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon)
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      return null;
+    }
+  };
+
+  const handleLocationSearch = async () => {
+    if (!locationInput.trim()) return;
+    
+    setIsLoadingLocation(true);
+    const coordinates = await geocodeLocation(locationInput);
+    
+    if (coordinates) {
+      setUserLocation(coordinates);
+      await fetchNearbyDoctors(coordinates);
+      toast({
+        title: "Location Found",
+        description: `Now showing doctors near ${locationInput}`,
+      });
+    } else {
+      toast({
+        title: "Location Not Found",
+        description: "Please try a different location or be more specific",
+        variant: "destructive",
+      });
+    }
+    setIsLoadingLocation(false);
   };
 
   const fetchNearbyDoctors = async (location: { lat: number; lng: number }) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to view doctor information.",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!user) return;
     
+    setLoading(true);
     try {
       // Get all doctor IDs first
       const { data: doctorIds, error: idsError } = await supabase
@@ -114,15 +165,20 @@ export default function FindDoctors() {
             return null;
           }
           
-          return data?.[0] ? {
-            ...data[0],
-            distance: calculateDistance(
-              location.lat,
-              location.lng,
-              doctor.latitude,
-              doctor.longitude
-            )
-          } : null;
+          const doctorData = data?.[0];
+          if (!doctorData) return null;
+
+          const distance = calculateDistance(
+            location.lat,
+            location.lng,
+            doctor.latitude,
+            doctor.longitude
+          );
+
+          return {
+            ...doctorData,
+            distance
+          };
         })
       );
 
@@ -131,7 +187,7 @@ export default function FindDoctors() {
         .filter(doctor => doctor !== null)
         .sort((a, b) => (a?.distance || 0) - (b?.distance || 0));
 
-      setDoctors(validDoctors);
+      setDoctors(validDoctors as Doctor[]);
     } catch (error) {
       console.error('Error fetching doctors:', error);
       toast({
@@ -145,10 +201,9 @@ export default function FindDoctors() {
   };
 
   const fetchAllDoctors = async () => {
-    if (!user) {
-      return; // Don't fetch if user is not authenticated
-    }
+    if (!user) return;
     
+    setLoading(true);
     try {
       // Get all doctor IDs first
       const { data: doctorIds, error: idsError } = await supabase
@@ -174,7 +229,7 @@ export default function FindDoctors() {
 
       // Filter out null values
       const validDoctors = doctorsWithInfo.filter(doctor => doctor !== null);
-      setDoctors(validDoctors);
+      setDoctors(validDoctors as Doctor[]);
     } catch (error) {
       console.error('Error fetching doctors:', error);
       toast({
@@ -182,6 +237,8 @@ export default function FindDoctors() {
         description: "Failed to fetch doctors.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -247,24 +304,54 @@ export default function FindDoctors() {
             className="text-center space-y-4"
           >
             <h1 className="text-3xl font-bold font-poppins text-primary">
-              {t('doctors.find_nearby')}
+              Find Doctors Near You
             </h1>
             
-            {!userLocation && (
-              <div className="bg-primary-light/10 p-4 rounded-lg border border-primary-light/20">
-                <p className="text-muted-foreground mb-4">
-                  {t('doctors.location_access')}
-                </p>
-                <Button 
+            {/* Location Access Section */}
+            <div className="bg-primary-light/10 p-4 rounded-lg border border-primary-light/20 space-y-4">
+              <p className="text-muted-foreground">
+                Get location access or enter your area to find nearby doctors
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
+                <Button
                   onClick={requestLocationPermission}
-                  disabled={loading}
-                  className="bg-gradient-primary"
+                  variant="outline"
+                  disabled={isLoadingLocation}
+                  className="bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700"
                 >
-                  <MapPin className="w-4 h-4 mr-2" />
-                  {loading ? t('common.loading') : t('doctors.enable_location')}
+                  <Target className="w-4 h-4 mr-2" />
+                  {isLoadingLocation ? 'Getting Location...' : 'Use My Location'}
                 </Button>
+                
+                {/* Manual Location Input */}
+                <div className="flex gap-2 flex-1">
+                  <Input
+                    placeholder="Enter your city or area (e.g., Mumbai, Delhi)"
+                    value={locationInput}
+                    onChange={(e) => setLocationInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleLocationSearch()}
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={handleLocationSearch}
+                    disabled={isLoadingLocation || !locationInput.trim()}
+                    className="bg-gradient-primary"
+                  >
+                    <Navigation className="w-4 h-4 mr-2" />
+                    {isLoadingLocation ? 'Searching...' : 'Find Nearby'}
+                  </Button>
+                </div>
               </div>
-            )}
+
+              {userLocation && (
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <p className="text-sm text-green-800">
+                    📍 Showing doctors near your location • Sorted by distance
+                  </p>
+                </div>
+              )}
+            </div>
 
             <div className="max-w-md mx-auto">
               <div className="relative">
@@ -279,17 +366,87 @@ export default function FindDoctors() {
             </div>
           </motion.div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{filteredDoctors.map((doctor, index) => (
-            <motion.div
-              key={doctor.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-...
-            </motion.div>
-          ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-muted-foreground">Loading doctors...</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredDoctors.map((doctor, index) => (
+                <motion.div
+                  key={doctor.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="hover:shadow-medical transition-shadow h-full">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center">
+                            <User className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg">{doctor.name}</CardTitle>
+                            <Badge variant="secondary">{doctor.specialty}</Badge>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm font-medium">{doctor.rating}</span>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          <span className="line-clamp-1">{doctor.address}</span>
+                        </div>
+                        {doctor.distance && (
+                          <div className="flex items-center gap-1 text-blue-600 font-medium">
+                            <Navigation className="w-4 h-4" />
+                            <span>{doctor.distance} km away</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4 text-muted-foreground" />
+                          <span>{doctor.availability_hours}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <DollarSign className="w-4 h-4 text-muted-foreground" />
+                          <span>₹{doctor.consultation_fee}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          onClick={() => handleBookAppointment(doctor)}
+                          className="flex-1 bg-gradient-primary"
+                          size="sm"
+                        >
+                          Book Appointment
+                        </Button>
+                        <Button
+                          onClick={() => handleCallDoctor(doctor)}
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-1"
+                        >
+                          <Phone className="w-4 h-4" />
+                          Call
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
 
           {filteredDoctors.length === 0 && !loading && (
             <div className="text-center py-12">
@@ -318,7 +475,6 @@ export default function FindDoctors() {
             setSelectedDoctor(null);
           }}
           onSuccess={() => {
-            // Optionally refresh appointments or navigate
             toast({
               title: "Success",
               description: "Appointment booked successfully!"
