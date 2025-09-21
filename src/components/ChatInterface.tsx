@@ -29,6 +29,44 @@ export const ChatInterface = () => {
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const formatAIResponse = (content: string) => {
+    // Split content by sentences and format into bullet points
+    const lines = content.split(/(?:[.!?]\s+)|(?:\n)/);
+    const formattedLines: JSX.Element[] = [];
+    
+    lines.forEach((line, index) => {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) return;
+      
+      // Check if line already has formatting (emojis, bullets, etc.)
+      if (trimmedLine.includes('•') || trimmedLine.includes('**') || /^[🏥🔍⚠️🏠💊]/.test(trimmedLine)) {
+        formattedLines.push(
+          <div key={index} className="mb-1">
+            {trimmedLine}
+          </div>
+        );
+      } else {
+        // Convert regular sentences to bullet points
+        if (trimmedLine.length > 20) { // Only format longer sentences
+          formattedLines.push(
+            <div key={index} className="mb-1 flex items-start">
+              <span className="text-primary mr-2 mt-1 text-xs">•</span>
+              <span>{trimmedLine.endsWith('.') ? trimmedLine : trimmedLine + '.'}</span>
+            </div>
+          );
+        } else if (trimmedLine.length > 0) {
+          formattedLines.push(
+            <div key={index} className="mb-1 font-semibold">
+              {trimmedLine}
+            </div>
+          );
+        }
+      }
+    });
+    
+    return formattedLines.length > 0 ? formattedLines : [<p key="default">{content}</p>];
+  };
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
@@ -153,7 +191,15 @@ export const ChatInterface = () => {
                   ? 'bg-primary text-primary-foreground ml-auto' 
                   : 'bg-card border border-primary-light/20'
               }`}>
-                <p className="text-sm leading-relaxed">{message.content}</p>
+                <div className="text-sm leading-relaxed">
+                  {message.type === 'ai' ? (
+                    <div className="space-y-2">
+                      {formatAIResponse(message.content)}
+                    </div>
+                  ) : (
+                    <p>{message.content}</p>
+                  )}
+                </div>
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-xs opacity-70">
                     {message.timestamp.toLocaleTimeString()}
