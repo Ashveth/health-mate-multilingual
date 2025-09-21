@@ -90,23 +90,24 @@ Current conversation language: ${userLanguage}`;
     const messages = [
       { role: 'system', content: systemPrompt },
       ...conversationHistory.slice(-10).map((msg: any) => ({
-        role: msg.role,
+        role: msg.type === 'ai' ? 'assistant' : 'user',
         content: msg.content
       })),
       { role: 'user', content: sanitizedMessage }
     ];
 
-    console.log('Sending request to Claude API with', messages.length, 'messages');
+    console.log('Sending request to OpenRouter API with', messages.length, 'messages');
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${claudeApiKey}`,
         'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01'
+        'HTTP-Referer': 'https://your-health-app.com',
+        'X-Title': 'AI HealthMate'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'anthropic/claude-3.5-sonnet',
         max_tokens: 1024,
         messages: messages
       }),
@@ -114,14 +115,14 @@ Current conversation language: ${userLanguage}`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Claude API error:', response.status, errorText);
-      throw new Error(`Claude API error: ${response.status} ${errorText}`);
+      console.error('OpenRouter API error:', response.status, errorText);
+      throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Claude API response received successfully');
+    console.log('OpenRouter API response received successfully');
     
-    const aiResponse = data.content[0].text;
+    const aiResponse = data.choices[0].message.content;
 
     return new Response(JSON.stringify({ 
       response: aiResponse,
