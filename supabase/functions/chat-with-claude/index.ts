@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const claudeApiKey = Deno.env.get('CLAUDE_API_KEY');
+const googleApiKey = Deno.env.get('GOOGLE_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -107,43 +107,52 @@ CRITICAL: Always end serious health concerns with "⚠️ **Please consult a qua
 
 Current conversation language: ${userLanguage}`;
 
-    // Build conversation history for context
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...conversationHistory.slice(-10).map((msg: any) => ({
-        role: msg.type === 'ai' ? 'assistant' : 'user',
-        content: msg.content
-      })),
-      { role: 'user', content: sanitizedMessage }
-    ];
+    // Build conversation history for Gemini format
+    const contents = [];
+    
+    // Add conversation history
+    conversationHistory.slice(-10).forEach((msg: any) => {
+      contents.push({
+        role: msg.type === 'ai' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+      });
+    });
+    
+    // Add current user message
+    contents.push({
+      role: 'user',
+      parts: [{ text: sanitizedMessage }]
+    });
 
-    console.log('Sending request to OpenRouter API with', messages.length, 'messages');
+    console.log('Sending request to Google Gemini API with', contents.length, 'messages');
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${googleApiKey}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${claudeApiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://your-health-app.com',
-        'X-Title': 'AI HealthMate'
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-3.5-sonnet',
-        max_tokens: 1024,
-        messages: messages
+        contents: contents,
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1024,
+        }
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenRouter API error:', response.status, errorText);
-      throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
+      console.error('Google Gemini API error:', response.status, errorText);
+      throw new Error(`Google Gemini API error: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('OpenRouter API response received successfully');
+    console.log('Google Gemini API response received successfully');
     
-    const aiResponse = data.choices[0].message.content;
+    const aiResponse = data.candidates[0].content.parts[0].text;
 
     return new Response(JSON.stringify({ 
       response: aiResponse,
