@@ -89,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) {
       toast({
         title: "Signup Error",
-        description: error.message,
+        description: "Unable to create account. Please try again.",
         variant: "destructive",
       });
     } else {
@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) {
       toast({
         title: "Login Error",
-        description: error.message,
+        description: "Invalid email or password. Please try again.",
         variant: "destructive",
       });
     }
@@ -139,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) {
       toast({
         title: "Google Login Error",
-        description: error.message,
+        description: "Unable to sign in with Google. Please try again.",
         variant: "destructive",
       });
     }
@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) {
       toast({
         title: "Password Reset Error",
-        description: error.message,
+        description: "Unable to send reset email. Please try again.",
         variant: "destructive",
       });
     } else {

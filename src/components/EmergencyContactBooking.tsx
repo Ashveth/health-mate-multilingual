@@ -10,6 +10,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { z } from 'zod';
+
+const contactBookingSchema = z.object({
+  appointment_date: z.string().min(1, "Date is required").refine((date) => {
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return selectedDate >= today;
+  }, "Date must be today or in the future"),
+  appointment_time: z.string().min(1, "Time is required"),
+  notes: z.string().max(500, "Notes must be less than 500 characters").optional(),
+});
 
 interface EmergencyContact {
   id: string;
@@ -48,6 +60,18 @@ export function EmergencyContactBooking({ contact, isOpen, onClose, onSuccess }:
       return;
     }
 
+    // Validate form data
+    const validationResult = contactBookingSchema.safeParse(formData);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      toast({
+        title: "Validation Error",
+        description: firstError.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     try {
@@ -56,10 +80,10 @@ export function EmergencyContactBooking({ contact, isOpen, onClose, onSuccess }:
         .from('appointments')
         .insert({
           user_id: user.id,
-          doctor_id: null, // We'll use notes to store contact info since this is not a formal doctor
-          appointment_date: formData.appointment_date,
-          appointment_time: formData.appointment_time,
-          notes: `Appointment with emergency contact: ${contact.name} (${contact.phone_number})\n\nAdditional notes: ${formData.notes}`,
+          doctor_id: null,
+          appointment_date: validationResult.data.appointment_date,
+          appointment_time: validationResult.data.appointment_time,
+          notes: `Appointment with emergency contact: ${contact.name} (${contact.phone_number})\n\nAdditional notes: ${validationResult.data.notes || ''}`,
           status: 'scheduled'
         });
 
@@ -81,7 +105,6 @@ export function EmergencyContactBooking({ contact, isOpen, onClose, onSuccess }:
       });
       
     } catch (error) {
-      console.error('Error booking appointment:', error);
       toast({
         title: "Booking Failed",
         description: "Failed to schedule appointment. Please try again.",

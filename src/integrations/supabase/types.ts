@@ -127,6 +127,38 @@ export type Database = {
         }
         Relationships: []
       }
+      doctor_contact_access_log: {
+        Row: {
+          access_type: string
+          accessed_at: string
+          doctor_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          access_type: string
+          accessed_at?: string
+          doctor_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          access_type?: string
+          accessed_at?: string
+          doctor_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_contact_access_log_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctors: {
         Row: {
           address: string
@@ -303,6 +335,10 @@ export type Database = {
           specialty: string
           updated_at: string
         }[]
+      }
+      log_doctor_contact_access: {
+        Args: { access_type: string; doctor_uuid: string }
+        Returns: undefined
       }
       user_has_appointment_with_doctor: {
         Args: { doctor_uuid: string }

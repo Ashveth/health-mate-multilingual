@@ -75,7 +75,6 @@ export default function FindDoctors() {
         description: "Now showing doctors near your location",
       });
     } catch (error) {
-      console.error('Location error:', error);
       toast({
         title: "Location access denied",
         description: "Please enter your location manually to find nearby doctors.",
@@ -114,7 +113,6 @@ export default function FindDoctors() {
       }
       return null;
     } catch (error) {
-      console.error('Geocoding error:', error);
       return null;
     }
   };
@@ -160,10 +158,7 @@ export default function FindDoctors() {
           const { data, error } = await supabase
             .rpc('get_doctor_info', { doctor_uuid: doctor.id });
           
-          if (error) {
-            console.error('Error fetching doctor info:', error);
-            return null;
-          }
+          if (error) return null;
           
           const doctorData = data?.[0];
           if (!doctorData) return null;
@@ -189,7 +184,6 @@ export default function FindDoctors() {
 
       setDoctors(validDoctors as Doctor[]);
     } catch (error) {
-      console.error('Error fetching doctors:', error);
       toast({
         title: "Error",
         description: "Failed to fetch nearby doctors.",
@@ -218,10 +212,7 @@ export default function FindDoctors() {
           const { data, error } = await supabase
             .rpc('get_doctor_info', { doctor_uuid: doctor.id });
           
-          if (error) {
-            console.error('Error fetching doctor info:', error);
-            return null;
-          }
+          if (error) return null;
           
           return data?.[0] || null;
         })
@@ -231,7 +222,6 @@ export default function FindDoctors() {
       const validDoctors = doctorsWithInfo.filter(doctor => doctor !== null);
       setDoctors(validDoctors as Doctor[]);
     } catch (error) {
-      console.error('Error fetching doctors:', error);
       toast({
         title: "Error",
         description: "Failed to fetch doctors.",

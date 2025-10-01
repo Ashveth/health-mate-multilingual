@@ -10,6 +10,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { z } from 'zod';
+
+const appointmentSchema = z.object({
+  appointment_date: z.string().min(1, "Date is required").refine((date) => {
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return selectedDate >= today;
+  }, "Date must be today or in the future"),
+  appointment_time: z.string().min(1, "Time is required"),
+  notes: z.string().max(500, "Notes must be less than 500 characters").optional(),
+});
 
 interface Doctor {
   id: string;
@@ -48,6 +60,18 @@ export function AppointmentBooking({ doctor, isOpen, onClose, onSuccess }: Appoi
       return;
     }
 
+    // Validate form data
+    const validationResult = appointmentSchema.safeParse(formData);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      toast({
+        title: "Validation Error",
+        description: firstError.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     try {
@@ -56,13 +80,19 @@ export function AppointmentBooking({ doctor, isOpen, onClose, onSuccess }: Appoi
         .insert({
           user_id: user.id,
           doctor_id: doctor.id,
-          appointment_date: formData.appointment_date,
-          appointment_time: formData.appointment_time,
-          notes: formData.notes,
+          appointment_date: validationResult.data.appointment_date,
+          appointment_time: validationResult.data.appointment_time,
+          notes: validationResult.data.notes || null,
           status: 'scheduled'
         });
 
       if (error) throw error;
+
+      // Log access to doctor contact information
+      await supabase.rpc('log_doctor_contact_access', {
+        doctor_uuid: doctor.id,
+        access_type: 'full_profile'
+      });
 
       toast({
         title: "Appointment Booked!",
@@ -80,7 +110,6 @@ export function AppointmentBooking({ doctor, isOpen, onClose, onSuccess }: Appoi
       });
       
     } catch (error) {
-      console.error('Error booking appointment:', error);
       toast({
         title: "Booking Failed",
         description: "Failed to book appointment. Please try again.",

@@ -104,7 +104,6 @@ export const ChatInterface = () => {
       };
       setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
-      console.error('Error in chatbot:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
@@ -154,7 +153,6 @@ export const ChatInterface = () => {
 
       return data.response || 'I apologize, but I encountered an issue processing your request. Please try again.';
     } catch (error) {
-      console.error('Error calling Claude API:', error);
       return 'Sorry, I couldn\'t process your health question right now. Please try again later or contact support.';
     }
   };
