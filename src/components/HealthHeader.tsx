@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import healthmateLogo from "@/assets/healthmate-logo.png";
 
 export const HealthHeader = () => {
   const { signOut, user } = useAuth();
@@ -35,9 +36,13 @@ export const HealthHeader = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center shadow-medical">
-              <Heart className="w-6 h-6 text-white" />
-            </div>
+            <motion.img
+              src={healthmateLogo}
+              alt="HealthMate Logo"
+              className="w-12 h-12 object-contain"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            />
             <div>
               <h1 className="text-2xl font-bold text-foreground font-poppins">AI HealthMate</h1>
               <p className="text-sm text-muted-foreground">

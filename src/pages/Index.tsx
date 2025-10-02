@@ -1,13 +1,29 @@
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChatInterface } from "@/components/ChatInterface";
 import { HealthHeader } from "@/components/HealthHeader";
 import { HealthDashboard } from "@/components/HealthDashboard";
 import { Sidebar } from "@/components/Sidebar";
+import { LoadingAnimation } from "@/components/LoadingAnimation";
 import { motion } from "framer-motion";
 
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [showLoading, setShowLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user has seen loading animation in this session
+    const hasSeenLoading = sessionStorage.getItem('hasSeenLoading');
+    if (hasSeenLoading) {
+      setShowLoading(false);
+    }
+  }, []);
+
+  const handleLoadingComplete = () => {
+    sessionStorage.setItem('hasSeenLoading', 'true');
+    setShowLoading(false);
+  };
   
   const getActiveView = () => {
     const path = location.pathname;
@@ -39,26 +55,29 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-bg flex">
-      <Sidebar activeView={getActiveView()} onViewChange={handleViewChange} />
-      
-      <div className="flex-1 flex flex-col md:ml-0">
-        <HealthHeader />
+    <>
+      {showLoading && <LoadingAnimation onComplete={handleLoadingComplete} />}
+      <div className="min-h-screen bg-gradient-bg flex">
+        <Sidebar activeView={getActiveView()} onViewChange={handleViewChange} />
         
-        <main className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto p-6">
-            <motion.div
-              key={getActiveView()}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderContent()}
-            </motion.div>
-          </div>
-        </main>
+        <div className="flex-1 flex flex-col md:ml-0">
+          <HealthHeader />
+          
+          <main className="flex-1 overflow-auto">
+            <div className="max-w-7xl mx-auto p-6">
+              <motion.div
+                key={getActiveView()}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {renderContent()}
+              </motion.div>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
