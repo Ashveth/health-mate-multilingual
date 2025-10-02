@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +15,14 @@ import {
 
 export const HealthHeader = () => {
   const { signOut, user } = useAuth();
+  const { toast } = useToast();
+
+  const handleNotificationClick = () => {
+    toast({
+      title: "Notifications",
+      description: "You have 3 new notifications: 2 appointment reminders and 1 health tip.",
+    });
+  };
 
   return (
     <header className="bg-gradient-bg border-b border-primary-light/20">
@@ -46,7 +55,12 @@ export const HealthHeader = () => {
           >
             <LanguageSelector />
             
-            <Button variant="ghost" size="icon" className="relative">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="relative"
+              onClick={handleNotificationClick}
+            >
               <Bell className="w-4 h-4" />
               <Badge className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center p-0 text-xs">
                 3

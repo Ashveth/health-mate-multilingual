@@ -53,7 +53,6 @@ export default function Appointments() {
       if (error) throw error;
       setAppointments((data || []) as Appointment[]);
     } catch (error) {
-      console.error('Error fetching appointments:', error);
       toast({
         title: "Connection Error",
         description: "Sorry, I couldn't fetch your appointments right now. Please try again later or contact support.",
@@ -61,6 +60,32 @@ export default function Appointments() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelAppointment = async (appointmentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: 'cancelled' })
+        .eq('id', appointmentId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Appointment Cancelled",
+        description: "Your appointment has been cancelled successfully.",
+      });
+
+      // Refresh appointments list
+      fetchAppointments();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to cancel appointment. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -201,7 +226,11 @@ export default function Appointments() {
                         <Button variant="outline" size="sm">
                           Reschedule
                         </Button>
-                        <Button variant="destructive" size="sm">
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => handleCancelAppointment(appointment.id)}
+                        >
                           Cancel
                         </Button>
                       </>
