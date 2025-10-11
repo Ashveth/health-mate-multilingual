@@ -226,12 +226,12 @@ export default function Emergency() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingContact ? 'Edit Contact' : t('emergency.add_contact')}
+                {editingContact ? t('emergency.edit_contact') : t('emergency.add_contact')}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label>Contact Type</Label>
+                <Label>{t('emergency.contact_type')}</Label>
                 <Select 
                   value={formData.contact_type} 
                   onValueChange={(value: any) => setFormData({...formData, contact_type: value})}
@@ -242,7 +242,7 @@ export default function Emergency() {
                   <SelectContent>
                     <SelectItem value="personal_doctor">{t('emergency.personal_doctor')}</SelectItem>
                     <SelectItem value="family_member">{t('emergency.family_member')}</SelectItem>
-                    <SelectItem value="emergency_service">Emergency Service</SelectItem>
+                    <SelectItem value="emergency_service">{t('emergency.emergency_service')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -251,7 +251,7 @@ export default function Emergency() {
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  placeholder="Enter name"
+                  placeholder={t('emergency.enter_name')}
                 />
               </div>
               <div>
@@ -259,7 +259,7 @@ export default function Emergency() {
                 <Input
                   value={formData.phone_number}
                   onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
-                  placeholder="+91-XXXXXXXXXX"
+                  placeholder={t('emergency.enter_phone')}
                 />
               </div>
               {formData.contact_type === 'family_member' && (
@@ -268,7 +268,7 @@ export default function Emergency() {
                   <Input
                     value={formData.relationship}
                     onChange={(e) => setFormData({...formData, relationship: e.target.value})}
-                    placeholder="e.g., Father, Mother, Spouse"
+                    placeholder={t('emergency.relationship_eg')}
                   />
                 </div>
               )}
@@ -295,7 +295,7 @@ export default function Emergency() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-800">
               <AlertTriangle className="w-5 h-5" />
-              Emergency Services
+              {t('emergency.emergency_services')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -317,7 +317,7 @@ export default function Emergency() {
               >
                 <Phone className="w-5 h-5 mr-2" />
                 <div className="text-left">
-                  <div className="font-bold">Police</div>
+                  <div className="font-bold">{t('emergency.police')}</div>
                   <div className="text-sm">100</div>
                 </div>
               </Button>
@@ -366,7 +366,7 @@ export default function Emergency() {
                         className="text-blue-600 hover:text-blue-700"
                       >
                         <Calendar className="w-4 h-4 mr-1" />
-                        Book
+                        {t('emergency.book')}
                       </Button>
                     )}
                     <Button
@@ -406,9 +406,9 @@ export default function Emergency() {
           className="text-center py-12"
         >
           <Phone className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No emergency contacts</h2>
+          <h2 className="text-xl font-semibold mb-2">{t('emergency.no_contacts')}</h2>
           <p className="text-muted-foreground mb-4">
-            Add your emergency contacts for quick access during urgent situations.
+            {t('emergency.add_contacts_desc')}
           </p>
           <Button onClick={() => setIsAddingContact(true)} className="bg-gradient-primary">
             <Plus className="w-4 h-4 mr-2" />

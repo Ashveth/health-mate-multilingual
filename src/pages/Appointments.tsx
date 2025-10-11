@@ -74,8 +74,8 @@ export default function Appointments() {
       if (error) throw error;
 
       toast({
-        title: "Appointment Cancelled",
-        description: "Your appointment has been cancelled successfully.",
+        title: t('appointments.cancelled'),
+        description: t('appointments.cancelled_desc'),
       });
 
       // Refresh appointments list
@@ -139,7 +139,7 @@ export default function Appointments() {
         </h1>
         <Button className="bg-gradient-primary">
           <Plus className="w-4 h-4 mr-2" />
-          Book New
+          {t('appointments.book_new')}
         </Button>
       </motion.div>
 
@@ -150,13 +150,13 @@ export default function Appointments() {
           className="text-center py-12"
         >
           <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No appointments yet</h2>
+          <h2 className="text-xl font-semibold mb-2">{t('appointments.no_appointments')}</h2>
           <p className="text-muted-foreground mb-4">
-            Book your first appointment with a doctor.
+            {t('appointments.book_first')}
           </p>
           <Button className="bg-gradient-primary">
             <Plus className="w-4 h-4 mr-2" />
-            Book Appointment
+            {t('appointments.book_appointment')}
           </Button>
         </motion.div>
       ) : (
@@ -224,14 +224,14 @@ export default function Appointments() {
                     {appointment.status === 'scheduled' && (
                       <>
                         <Button variant="outline" size="sm">
-                          Reschedule
+                          {t('appointments.reschedule')}
                         </Button>
                         <Button 
                           variant="destructive" 
                           size="sm"
                           onClick={() => handleCancelAppointment(appointment.id)}
                         >
-                          Cancel
+                          {t('appointments.cancel')}
                         </Button>
                       </>
                     )}

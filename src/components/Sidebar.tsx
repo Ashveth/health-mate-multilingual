@@ -16,55 +16,57 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SidebarProps {
   activeView: string;
   onViewChange: (view: string) => void;
 }
 
-const sidebarItems = [
-  { 
-    id: "chat", 
-    label: "AI Assistant", 
-    icon: MessageCircle, 
-    badge: "AI",
-    description: "Chat with health AI"
-  },
-  { 
-    id: "dashboard", 
-    label: "Dashboard", 
-    icon: Activity, 
-    description: "Health overview"
-  },
-  { 
-    id: "appointments", 
-    label: "Appointments", 
-    icon: Calendar,
-    badge: "3",
-    description: "Manage bookings"
-  },
-  { 
-    id: "doctors", 
-    label: "Find Doctors", 
-    icon: Users,
-    description: "Browse specialists"
-  },
-  { 
-    id: "records", 
-    label: "Health Records", 
-    icon: FileText,
-    description: "Medical history"
-  },
-  { 
-    id: "emergency", 
-    label: "Emergency", 
-    icon: Phone,
-    description: "Urgent care"
-  },
-];
-
 export const Sidebar = ({ activeView, onViewChange }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { t } = useLanguage();
+  
+  const sidebarItems = [
+    { 
+      id: "chat", 
+      labelKey: "sidebar.ai_assistant", 
+      icon: MessageCircle, 
+      badge: "AI",
+      descKey: "sidebar.chat_desc"
+    },
+    { 
+      id: "dashboard", 
+      labelKey: "sidebar.dashboard", 
+      icon: Activity, 
+      descKey: "sidebar.dashboard_desc"
+    },
+    { 
+      id: "appointments", 
+      labelKey: "sidebar.appointments", 
+      icon: Calendar,
+      badge: "3",
+      descKey: "sidebar.appointments_desc"
+    },
+    { 
+      id: "doctors", 
+      labelKey: "sidebar.find_doctors", 
+      icon: Users,
+      descKey: "sidebar.doctors_desc"
+    },
+    { 
+      id: "records", 
+      labelKey: "sidebar.health_records", 
+      icon: FileText,
+      descKey: "sidebar.records_desc"
+    },
+    { 
+      id: "emergency", 
+      labelKey: "sidebar.emergency", 
+      icon: Phone,
+      descKey: "sidebar.emergency_desc"
+    },
+  ];
 
   return (
     <>
@@ -152,9 +154,9 @@ export const Sidebar = ({ activeView, onViewChange }: SidebarProps) => {
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-medium text-sm">{item.label}</p>
+                            <p className="font-medium text-sm">{t(item.labelKey)}</p>
                             <p className="text-xs opacity-70 mt-0.5">
-                              {item.description}
+                              {t(item.descKey)}
                             </p>
                           </div>
                           {item.badge && (
@@ -196,7 +198,7 @@ export const Sidebar = ({ activeView, onViewChange }: SidebarProps) => {
                     exit={{ opacity: 0 }}
                     className="font-medium text-sm"
                   >
-                    Settings
+                    {t('nav.settings')}
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -213,14 +215,14 @@ export const Sidebar = ({ activeView, onViewChange }: SidebarProps) => {
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <Stethoscope className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium">Health Status</span>
+                    <span className="text-sm font-medium">{t('sidebar.health_status')}</span>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    All systems normal
+                    {t('sidebar.all_systems_normal')}
                   </div>
                   <div className="flex items-center gap-1 mt-1">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-xs text-primary">Online</span>
+                    <span className="text-xs text-primary">{t('sidebar.online')}</span>
                   </div>
                 </motion.div>
               )}

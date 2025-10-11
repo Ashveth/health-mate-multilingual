@@ -294,13 +294,13 @@ export default function FindDoctors() {
             className="text-center space-y-4"
           >
             <h1 className="text-3xl font-bold font-poppins text-primary">
-              Find Doctors Near You
+              {t('doctors.title')}
             </h1>
             
             {/* Location Access Section */}
             <div className="bg-primary-light/10 p-4 rounded-lg border border-primary-light/20 space-y-4">
               <p className="text-muted-foreground">
-                Get location access or enter your area to find nearby doctors
+                {t('doctors.location_prompt')}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
@@ -311,13 +311,13 @@ export default function FindDoctors() {
                   className="bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700"
                 >
                   <Target className="w-4 h-4 mr-2" />
-                  {isLoadingLocation ? 'Getting Location...' : 'Use My Location'}
+                  {isLoadingLocation ? t('doctors.getting_location') : t('doctors.use_my_location')}
                 </Button>
                 
                 {/* Manual Location Input */}
                 <div className="flex gap-2 flex-1">
                   <Input
-                    placeholder="Enter your city or area (e.g., Mumbai, Delhi)"
+                    placeholder={t('doctors.enter_location')}
                     value={locationInput}
                     onChange={(e) => setLocationInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleLocationSearch()}
@@ -329,7 +329,7 @@ export default function FindDoctors() {
                     className="bg-gradient-primary"
                   >
                     <Navigation className="w-4 h-4 mr-2" />
-                    {isLoadingLocation ? 'Searching...' : 'Find Nearby'}
+                    {isLoadingLocation ? t('doctors.searching') : t('doctors.find_nearby_btn')}
                   </Button>
                 </div>
               </div>
@@ -337,7 +337,7 @@ export default function FindDoctors() {
               {userLocation && (
                 <div className="bg-green-50 p-3 rounded-lg">
                   <p className="text-sm text-green-800">
-                    📍 Showing doctors near your location • Sorted by distance
+                    📍 {t('doctors.showing_nearby')}
                   </p>
                 </div>
               )}
@@ -347,7 +347,7 @@ export default function FindDoctors() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
-                  placeholder="Search by name, specialization, or location..."
+                  placeholder={t('doctors.search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -359,7 +359,7 @@ export default function FindDoctors() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-muted-foreground">Loading doctors...</p>
+              <p className="mt-4 text-muted-foreground">{t('doctors.loading')}</p>
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -397,7 +397,7 @@ export default function FindDoctors() {
                         {doctor.distance && (
                           <div className="flex items-center gap-1 text-blue-600 font-medium">
                             <Navigation className="w-4 h-4" />
-                            <span>{doctor.distance} km away</span>
+                            <span>{doctor.distance} {t('doctors.km_away')}</span>
                           </div>
                         )}
                       </div>
@@ -419,7 +419,7 @@ export default function FindDoctors() {
                           className="flex-1 bg-gradient-primary"
                           size="sm"
                         >
-                          Book Appointment
+                          {t('doctors.book_appointment')}
                         </Button>
                         <Button
                           onClick={() => handleCallDoctor(doctor)}
@@ -428,7 +428,7 @@ export default function FindDoctors() {
                           className="flex items-center gap-1"
                         >
                           <Phone className="w-4 h-4" />
-                          Call
+                          {t('common.call')}
                         </Button>
                       </div>
                     </CardContent>
@@ -441,15 +441,15 @@ export default function FindDoctors() {
           {filteredDoctors.length === 0 && !loading && (
             <div className="text-center py-12">
               <User className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-xl font-semibold mb-2">No doctors found</h2>
+              <h2 className="text-xl font-semibold mb-2">{t('doctors.no_doctors')}</h2>
               <p className="text-muted-foreground mb-4">
-                I couldn't find any doctors matching your request. Please try another search or contact support.
+                {t('doctors.no_doctors_desc')}
               </p>
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p>💡 **Try searching for:**</p>
-                <p>• Specialization: "cardiologist", "pediatrician"</p>
-                <p>• Doctor name: "Dr. Smith"</p>
-                <p>• Location: "Mumbai", "Delhi"</p>
+                <p>💡 **{t('doctors.try_search')}**</p>
+                <p>• {t('doctors.specialization')}</p>
+                <p>• {t('doctors.doctor_name')}</p>
+                <p>• {t('doctors.location_example')}</p>
               </div>
             </div>
           )}
