@@ -58,6 +58,45 @@ export type Database = {
           },
         ]
       }
+      connected_devices: {
+        Row: {
+          access_token: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          provider: string
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          provider: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          provider?: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
@@ -239,6 +278,45 @@ export type Database = {
           phone_number?: string
           relationship?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      health_data: {
+        Row: {
+          calories_burned: number | null
+          created_at: string | null
+          date: string
+          heart_rate_avg: number | null
+          id: string
+          provider: string
+          sleep_minutes: number | null
+          steps: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          calories_burned?: number | null
+          created_at?: string | null
+          date: string
+          heart_rate_avg?: number | null
+          id?: string
+          provider: string
+          sleep_minutes?: number | null
+          steps?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          calories_burned?: number | null
+          created_at?: string | null
+          date?: string
+          heart_rate_avg?: number | null
+          id?: string
+          provider?: string
+          sleep_minutes?: number | null
+          steps?: number | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
