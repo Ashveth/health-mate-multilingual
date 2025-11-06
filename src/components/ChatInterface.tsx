@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   id: string;
@@ -28,44 +29,6 @@ export const ChatInterface = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const formatAIResponse = (content: string) => {
-    // Split content by sentences and format into bullet points
-    const lines = content.split(/(?:[.!?]\s+)|(?:\n)/);
-    const formattedLines: JSX.Element[] = [];
-    
-    lines.forEach((line, index) => {
-      const trimmedLine = line.trim();
-      if (!trimmedLine) return;
-      
-      // Check if line already has formatting (emojis, bullets, etc.)
-      if (trimmedLine.includes('•') || trimmedLine.includes('**') || /^[🏥🔍⚠️🏠💊]/.test(trimmedLine)) {
-        formattedLines.push(
-          <div key={index} className="mb-1">
-            {trimmedLine}
-          </div>
-        );
-      } else {
-        // Convert regular sentences to bullet points
-        if (trimmedLine.length > 20) { // Only format longer sentences
-          formattedLines.push(
-            <div key={index} className="mb-1 flex items-start">
-              <span className="text-primary mr-2 mt-1 text-xs">•</span>
-              <span>{trimmedLine.endsWith('.') ? trimmedLine : trimmedLine + '.'}</span>
-            </div>
-          );
-        } else if (trimmedLine.length > 0) {
-          formattedLines.push(
-            <div key={index} className="mb-1 font-semibold">
-              {trimmedLine}
-            </div>
-          );
-        }
-      }
-    });
-    
-    return formattedLines.length > 0 ? formattedLines : [<p key="default">{content}</p>];
-  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -186,8 +149,20 @@ export const ChatInterface = () => {
               }`}>
                 <div className="text-sm leading-relaxed">
                   {message.type === 'ai' ? (
-                    <div className="space-y-2">
-                      {formatAIResponse(message.content)}
+                    <div className="markdown-content">
+                      <ReactMarkdown 
+                        components={{
+                          p: ({children}) => <p className="mb-2">{children}</p>,
+                          ul: ({children}) => <ul className="space-y-1 mb-2">{children}</ul>,
+                          li: ({children}) => <li className="flex items-start"><span className="text-primary mr-2 mt-1">•</span><span className="flex-1">{children}</span></li>,
+                          strong: ({children}) => <strong className="font-semibold text-foreground">{children}</strong>,
+                          h1: ({children}) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                          h2: ({children}) => <h2 className="text-base font-bold mb-2">{children}</h2>,
+                          h3: ({children}) => <h3 className="text-sm font-semibold mb-1">{children}</h3>,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
                     </div>
                   ) : (
                     <p>{message.content}</p>
