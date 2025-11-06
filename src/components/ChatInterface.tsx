@@ -119,11 +119,6 @@ export const ChatInterface = () => {
   const handleChatbotWorkflow = async (message: string): Promise<string> => {
     const lowerMessage = message.toLowerCase();
     
-    // Health Records - HIPAA/GDPR Compliance
-    if (lowerMessage.includes('health record') || lowerMessage.includes('medical record') || lowerMessage.includes('health history')) {
-      return "For your safety, I cannot store or display health records. Please contact your healthcare provider directly for access to your medical records.";
-    }
-    
     // Doctor Appointment Booking Workflow
     if (lowerMessage.includes('book') && (lowerMessage.includes('appointment') || lowerMessage.includes('doctor'))) {
       return "I'll help you book an appointment! Please tell me:\n\n1️⃣ **Doctor's name** or **specialization** (e.g., 'cardiologist', 'Dr. Smith')\n\nYou can also visit the 'Find Doctors' section to browse available doctors and book directly.";

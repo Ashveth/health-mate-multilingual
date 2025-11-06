@@ -55,14 +55,8 @@ export const Sidebar = ({ activeView, onViewChange }: SidebarProps) => {
       descKey: "sidebar.doctors_desc"
     },
     { 
-      id: "records", 
-      labelKey: "sidebar.health_records", 
-      icon: FileText,
-      descKey: "sidebar.records_desc"
-    },
-    { 
       id: "emergency", 
-      labelKey: "sidebar.emergency", 
+      labelKey: "sidebar.emergency",
       icon: Phone,
       descKey: "sidebar.emergency_desc"
     },
