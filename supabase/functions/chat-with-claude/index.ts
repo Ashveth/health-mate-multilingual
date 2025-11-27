@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const googleApiKey = Deno.env.get('GOOGLE_API_KEY');
+const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -116,52 +116,59 @@ CRITICAL: Always end serious health concerns with:
 
 Current conversation language: ${userLanguage}`;
 
-    // Build conversation history for Gemini format
-    const contents = [];
+    // Build conversation history for OpenAI format
+    const messages = [
+      { role: 'system', content: systemPrompt }
+    ];
     
     // Add conversation history
     conversationHistory.slice(-10).forEach((msg: any) => {
-      contents.push({
-        role: msg.type === 'ai' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
+      messages.push({
+        role: msg.type === 'ai' ? 'assistant' : 'user',
+        content: msg.content
       });
     });
     
     // Add current user message
-    contents.push({
+    messages.push({
       role: 'user',
-      parts: [{ text: sanitizedMessage }]
+      content: sanitizedMessage
     });
 
-    console.log('Sending request to Google Gemini API with', contents.length, 'messages');
+    console.log('Sending request to Lovable AI Gateway with', messages.length, 'messages');
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${googleApiKey}`, {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: contents,
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        },
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1024,
-        }
+        model: 'google/gemini-2.5-flash',
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 1024,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Google Gemini API error:', response.status, errorText);
-      throw new Error(`Google Gemini API error: ${response.status} ${errorText}`);
+      console.error('Lovable AI Gateway error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+      }
+      if (response.status === 402) {
+        throw new Error('AI credits depleted. Please add credits to continue using AI features.');
+      }
+      
+      throw new Error(`Lovable AI Gateway error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Google Gemini API response received successfully');
+    console.log('Lovable AI Gateway response received successfully');
     
-    const aiResponse = data.candidates[0].content.parts[0].text;
+    const aiResponse = data.choices[0].message.content;
 
     return new Response(JSON.stringify({ 
       response: aiResponse,
