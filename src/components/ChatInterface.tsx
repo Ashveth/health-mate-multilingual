@@ -12,6 +12,7 @@ import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useSound } from "@/hooks/useSound";
 
 interface Message {
   id: string;
@@ -85,6 +86,9 @@ export const ChatInterface = () => {
     rate: 1,
   });
 
+  // Sound effects hook
+  const { playSound } = useSound();
+
   // Update input when transcript changes
   useEffect(() => {
     if (transcript) {
@@ -119,6 +123,9 @@ export const ChatInterface = () => {
     setInputMessage('');
     resetTranscript();
     setIsLoading(true);
+    
+    // Play send sound effect
+    playSound('send');
 
     try {
       // Handle specific chatbot workflows
@@ -133,6 +140,9 @@ export const ChatInterface = () => {
         sources: []
       };
       setMessages(prev => [...prev, aiResponse]);
+      
+      // Play receive sound effect
+      playSound('receive');
 
       // Auto-read AI response if enabled
       if (voiceEnabled && autoRead && isTTSSupported) {
