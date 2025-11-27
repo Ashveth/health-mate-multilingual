@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,7 @@ import healthmateLogo from "@/assets/healthmate-logo.png";
 export const HealthHeader = () => {
   const { signOut, user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleNotificationClick = () => {
     toast({
@@ -87,9 +89,14 @@ export const HealthHeader = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Help & Support</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/profile')}>Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/settings')}>Settings</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  toast({
+                    title: "Help & Support",
+                    description: "For assistance, please email support@healthmate.com or call 1-800-HEALTH",
+                  });
+                }}>Help & Support</DropdownMenuItem>
                 <DropdownMenuItem className="text-red-600" onClick={signOut}>
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
@@ -106,11 +113,21 @@ export const HealthHeader = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Button variant="outline" size="sm" className="text-xs hover:bg-accent-light/10">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-xs hover:bg-accent-light/10"
+            onClick={() => navigate('/doctors')}
+          >
             <Users className="w-3 h-3 mr-1" />
             Find Doctors
           </Button>
-          <Button variant="outline" size="sm" className="text-xs hover:bg-accent-light/10">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-xs hover:bg-accent-light/10"
+            onClick={() => navigate('/appointments')}
+          >
             <Calendar className="w-3 h-3 mr-1" />
             Book Appointment
           </Button>

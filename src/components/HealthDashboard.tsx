@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { DiseaseOutbreakAlert } from "@/components/DiseaseOutbreakAlert";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-medical.jpg";
 import healthIcons from "@/assets/health-icons.jpg";
 import doctorFemale from "@/assets/doctor-female.jpg";
@@ -59,6 +60,8 @@ const healthTips = [
 ];
 
 export const HealthDashboard = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-8 font-inter">
       {/* Disease Outbreak Alerts */}
@@ -83,7 +86,10 @@ export const HealthDashboard = () => {
             <p className="text-lg opacity-90 mb-4">
               Get personalized health insights and connect with top medical professionals
             </p>
-            <Button className="bg-white text-primary hover:bg-white/90">
+            <Button 
+              className="bg-white text-primary hover:bg-white/90"
+              onClick={() => navigate('/chat')}
+            >
               Start Health Assessment
             </Button>
           </div>
@@ -166,7 +172,10 @@ export const HealthDashboard = () => {
                       )}
                     </div>
                   </div>
-                  <Button className="w-full mt-4 bg-gradient-primary hover:shadow-medical">
+                  <Button 
+                    className="w-full mt-4 bg-gradient-primary hover:shadow-medical"
+                    onClick={() => navigate('/doctors')}
+                  >
                     Book Consultation
                   </Button>
                 </motion.div>
@@ -232,10 +241,15 @@ export const HealthDashboard = () => {
                 <Button 
                   variant="destructive" 
                   className="bg-red-600 hover:bg-red-700"
+                  onClick={() => window.open('tel:108', '_self')}
                 >
                   Call Emergency
                 </Button>
-                <Button variant="outline" className="border-red-300 text-red-700 hover:bg-red-50">
+                <Button 
+                  variant="outline" 
+                  className="border-red-300 text-red-700 hover:bg-red-50"
+                  onClick={() => navigate('/emergency')}
+                >
                   <MapPin className="w-4 h-4 mr-2" />
                   Find Hospital
                 </Button>

@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Appointment {
   id: string;
@@ -28,6 +29,7 @@ export default function Appointments() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
@@ -137,7 +139,10 @@ export default function Appointments() {
         <h1 className="text-3xl font-bold font-poppins text-primary">
           {t('appointments.my_appointments')}
         </h1>
-        <Button className="bg-gradient-primary">
+        <Button 
+          className="bg-gradient-primary"
+          onClick={() => window.location.href = '/doctors'}
+        >
           <Plus className="w-4 h-4 mr-2" />
           {t('appointments.book_new')}
         </Button>
@@ -154,7 +159,10 @@ export default function Appointments() {
           <p className="text-muted-foreground mb-4">
             {t('appointments.book_first')}
           </p>
-          <Button className="bg-gradient-primary">
+          <Button 
+            className="bg-gradient-primary"
+            onClick={() => navigate('/doctors')}
+          >
             <Plus className="w-4 h-4 mr-2" />
             {t('appointments.book_appointment')}
           </Button>
