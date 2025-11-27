@@ -131,11 +131,31 @@ export default function Settings() {
     });
   };
 
-  const handleLanguageChange = (language: string) => {
+  const handleLanguageChange = async (language: string) => {
     setProfile({
       ...profile,
       preferred_language: language
     });
+    
+    // Apply language change immediately
+    setLanguage(language as any);
+    
+    // Save to database immediately
+    try {
+      await supabase
+        .from('profiles')
+        .upsert({
+          user_id: user?.id,
+          preferred_language: language
+        });
+      
+      toast({
+        title: "Language Updated",
+        description: "Your language preference has been saved.",
+      });
+    } catch (error) {
+      console.error('Error updating language:', error);
+    }
   };
 
   if (loading) {
