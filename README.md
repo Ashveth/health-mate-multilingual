@@ -312,7 +312,7 @@ Route	Page	Auth
 
 🌐 Web App: https://health-mate-multilingual.vercel.app/
 
-▶️ Demo Video: 
+▶️ Demo Video : https://youtu.be/MvbbQbFw0ak?si=QsVcm2PKWu6rjBqf 
 
 📜 License
 
