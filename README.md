@@ -1,119 +1,321 @@
-# 🏥 AI HealthMate – AI-Driven Public Health Chatbot
+🏥 AI HealthMate – Multilingual Public Health Assistant
 
-## 🚀 Smart India Hackathon Project (SIH25049)
+AI HealthMate is a full-stack, AI-powered, multilingual public health chatbot that empowers users with reliable, evidence-based health guidance using LLMs, Knowledge Graphs, and WHO-verified information.
+It provides medical assistance, doctor discovery, appointment booking, emergency support, and multilingual communication — all in one seamless platform.
 
-🌟 **AI HealthMate** is an AI-powered, multilingual public health chatbot crafted for Smart India Hackathon 2025. It empowers users to get reliable, accurate, and multi-language health guidance using the latest in AI (LLMs & Knowledge Graphs). This solution bridges the gap between patients and trustworthy medical information!
+🚀 Features
+🤖 AI Health Chatbot
 
----
+Multilingual responses (10+ Indian languages)
 
-## 📌 Problem Statement
+WHO-verified guidance
 
-![SIH Problem Statement](docs/screenshots/WhatsApp-Image-2025-09-02-at-23.35.57_3c4f6874.jpg)
+Medical Knowledge Graph for disease data
 
----
+Context-aware conversations (keeps last 10 messages)
 
-## 🌐 Theme: HealthTech
+Markdown-formatted responses
 
----
+Workflow detection (appointment booking, doctor search, emergency)
 
-## 💡 Why It's Strong
+Safe & validated medical responses
 
-- ✅ Simple to build, highly impactful  
-- ✅ Bridges the gap between patients and reliable health data  
-- ✅ Multi-language support for real inclusivity  
+🎙️ Voice Features
 
----
+Speech-to-Text (voice input)
 
-## 🛠️ Solution Idea
+Text-to-Speech (voice output)
 
-- 🤖 **AI HealthMate** answers any disease or health-related queries in multiple languages  
-- 📚 Uses state-of-the-art LLMs (Claude Sonnet 3.5, DeepSeek) + Knowledge Graphs for accuracy  
-- 🏆 Fast to implement, high usability, impactful for both urban & rural users  
+Auto-read responses
 
----
+Adjustable TTS speed (0.5× – 2.0×)
 
-## ✨ Winning Edge
+🔊 Sound Effects
 
-- ⚡ Lightning-quick implementation  
-- 🌍 Universal language support  
-- 🎯 High usability for diverse populations  
+Message send sound (“whoosh”)
 
----
+Response sound notification
 
-## 👥 Team InnoSphere
+Built using Web Audio API (no external assets)
 
-| Name                 | Role        |  
-|----------------------|-------------|  
-| Ashveth Pawar        | Team Leader |  
-| Vaishnavi Patil      | Member      |  
-| Prasad Patil         | Member      |  
-| Vighnesh Parab       | Member      |  
-| Nandini Rathod       | Member      |  
-| Krushna Rathi        | Member      |  
+⏳ Enhanced Typing Indicator
 
----
+Bouncing dots animation
 
-## 🏗️ Tech Stack
+“AI is typing…” display
 
-- **Frontend:** React / Next.js / TailwindCSS  
-- **Backend:** Node.js / Python (FastAPI / Flask)  
-- **Database:** PostgreSQL / Supabase  
-- **AI Models:** Claude Sonnet 3.5, DeepSeek  
-- **Hosting:** Lovable.ai  
+Smooth Framer Motion transitions
 
----
+📱 User Interface
 
-## 📸 App Screenshots
+Responsive — works on all devices
 
-- ![Login & Welcome Page](docs/screenshots/1.jpg)  
-- ![Main Dashboard Menu](docs/screenshots/2.jpg)  
-- ![Health Assistant Chat](docs/screenshots/3.jpg)  
-- ![Profile Greeting & Services](docs/screenshots/4.jpg)  
-- ![Health Alerts Panel](docs/screenshots/5.jpg)  
-- ![App Splash Screen](docs/screenshots/6.jpg)  
+Dark/Light theme support
 
----
+Glassmorphism UI
 
-## 🌍 Try AI HealthMate Now!
+Sidebar navigation
 
-- 🖥️ **Live Website:** [health-mate-multilingual.lovable.app/chat](https://health-mate-multilingual.lovable.app/chat)  
-- 📱 **Download Android App:** [Google Drive Link](https://drive.google.com/file/d/19x0n9xuQIrZHXCmew87JoJOyahIwhyn5/view?usp=drivesdk)  
-- ▶️ **YouTube App Demo:** [https://youtube.com/shorts/6pRFKcUGj2U?si=hvfwl0TWRr8p_CFX](https://youtube.com/shorts/6pRFKcUGj2U?si=hvfwl0TWRr8p_CFX)  
+Animated splash screen
 
-> ℹ️ Website video demo coming soon...
+👨‍⚕️ Find Doctors
 
----
+Geolocation-based search
 
-## 🏗️ Local Installation & Setup
+Manual city/area search
 
-Clone the repository
-git clone https://github.com/your-username/health-mate-multilingual.git
-cd health-mate-multilingual
+Distance calculation using Haversine Formula
 
-Install dependencies
-npm install # for React/Next.js frontend
-pip install -r requirements.txt # for Python backend
+Doctor profiles (rating, experience, fee)
 
-Start local dev servers
-npm run dev
+Secure contact reveal (after valid appointment)
 
-or
-python app.py
+Real-time filters
 
-text
+📅 Appointment Booking
 
----
+Date & time picker
 
-## 🤝 Contributing
+Doctor-specific booking
 
-We welcome contributions! Please check the [issues](https://github.com/your-username/health-mate-multilingual/issues) page to get started.
+Appointment notes
 
----
+Status states: Scheduled / Completed / Cancelled
 
-## 📜 License
+Appointment history + rescheduling
 
-This project is licensed under the MIT License.
+🚨 Emergency Services
 
----
+Quick dial: Ambulance (108), Police (100)
 
-⭐ **Star** this repo if you support accessible, AI-powered healthcare for all!
+Personal emergency contacts
+
+CRUD for contacts
+
+Book appointments with personal doctor
+
+👤 User Profile & Settings
+
+Personal information
+
+Language preferences
+
+Notifications (tips, alerts, reminders)
+
+Voice settings + speech rate slider
+
+🌍 Multilingual Support (10 Languages)
+
+English
+
+Hindi
+
+Tamil
+
+Telugu
+
+Kannada
+
+Bengali
+
+Marathi
+
+Gujarati
+
+Malayalam
+
+Punjabi
+
+🔐 Authentication & Security
+
+Email/Password auth
+
+Google OAuth
+
+Protected routes
+
+Row Level Security (RLS)
+
+Input sanitization
+
+API rate limiting
+
+📊 Health Dashboard
+
+Health statistics
+
+Featured doctors
+
+Daily health tips
+
+Outbreak alerts (WHO-sourced)
+
+Emergency quick access
+
+📋 Medical Disclaimer
+
+Data sources (WHO, CDC, medical journals)
+
+Verification process
+
+AI limitations & safety warnings
+
+Terms of use
+
+🛠️ Tech Stack
+Frontend
+Technology	Version	Purpose
+React	18.3.1	UI Framework
+TypeScript	5.8.3	Type-safe development
+Vite	5.4.19	Build tooling
+TailwindCSS	3.4.17	Styling
+Framer Motion	12.23.16	Animations
+React Router DOM	6.30.1	Routing
+TanStack React Query	5.83.0	Server state
+
+UI & Components
+
+Radix UI
+
+shadcn/ui
+
+Lucide Icons
+
+Recharts
+
+Embla Carousel
+
+Sonner Toasts
+
+class-variance-authority
+
+tailwind-merge
+
+Backend & Database
+Technology	Purpose
+Lovable Cloud (Supabase)	Backend
+PostgreSQL	Database
+Supabase Auth	Authentication
+Edge Functions	Serverless logic
+RLS Policies	Data access control
+AI & NLP
+Technology	Purpose
+Google Gemini 2.5 Flash	Primary AI model
+Lovable AI Gateway	Model management
+Medical Knowledge Graph	Structured medical data
+WHO Guidelines	Verified medical information
+Forms & Validation
+
+React Hook Form
+
+Zod
+
+@hookform/resolvers
+
+Utilities
+
+date-fns
+
+React Markdown
+
+cmdk
+
+react-day-picker
+
+🗄️ Database Schema
+Tables
+Table	Purpose
+profiles	User profiles
+doctors	Doctor listings
+appointments	Bookings
+emergency_contacts	Emergency contacts
+health_alerts	WHO outbreak data
+doctor_contact_access_log	Access audits
+Functions
+
+handle_new_user()
+
+get_doctor_info()
+
+user_has_appointment_with_doctor()
+
+log_doctor_contact_access()
+
+🌐 Edge Functions
+chat-with-claude
+
+Chat response generation
+
+WHO integration
+
+Knowledge graph
+
+Input validation
+
+Rate limiting
+
+update-health-alerts
+
+Fetches & updates disease outbreak data
+
+📁 Project Structure
+src/
+├── components/
+│   ├── ui/
+│   ├── ChatInterface.tsx
+│   ├── HealthDashboard.tsx
+│   ├── HealthHeader.tsx
+│   ├── Sidebar.tsx
+│   ├── AppointmentBooking.tsx
+│   ├── DiseaseOutbreakAlert.tsx
+│   ├── EmergencyContactBooking.tsx
+│   ├── LanguageSelector.tsx
+│   ├── LoadingAnimation.tsx
+│   └── ProtectedRoute.tsx
+├── hooks/
+│   ├── useAuth.tsx
+│   ├── useSpeechRecognition.ts
+│   ├── useTextToSpeech.ts
+│   ├── useSound.ts
+│   ├── useRateLimit.ts
+│   └── use-mobile.tsx
+├── contexts/
+│   └── LanguageContext.tsx
+├── pages/
+│   ├── Index.tsx
+│   ├── Auth.tsx
+│   ├── Profile.tsx
+│   ├── FindDoctors.tsx
+│   ├── Appointments.tsx
+│   ├── Emergency.tsx
+│   ├── Settings.tsx
+│   ├── MedicalDisclaimer.tsx
+│   └── NotFound.tsx
+├── integrations/
+│   └── supabase/
+│       ├── client.ts
+│       └── types.ts
+└── assets/
+
+🚀 App Routes
+Route	Page	Auth
+/	Dashboard	✅
+/chat	AI Chat	✅
+/auth	Sign in / Sign up	❌
+/profile	User profile	✅
+/doctors	Find doctors	✅
+/appointments	Appointments	✅
+/emergency	Emergency	✅
+/settings	Settings	✅
+/disclaimer	Medical disclaimer	✅
+🔗 Live Links
+
+🌐 Web App: w
+
+📱 Android App: Google Drive link
+
+▶️ Demo Video: YouTube link
+
+📜 License
+
+MIT License
