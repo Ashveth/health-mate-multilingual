@@ -1,1 +1,7 @@
 project_id = "zkxifbvetcvncsyvyksb"
+
+[functions.chat-with-claude]
+verify_jwt = false
+
+[functions.update-health-alerts]
+verify_jwt = false
