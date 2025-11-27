@@ -13,6 +13,7 @@ import FindDoctors from "./pages/FindDoctors";
 import Appointments from "./pages/Appointments";
 import Emergency from "./pages/Emergency";
 import Settings from "./pages/Settings";
+import MedicalDisclaimer from "./pages/MedicalDisclaimer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +61,11 @@ const App = () => (
               <Route path="/settings" element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/disclaimer" element={
+                <ProtectedRoute>
+                  <MedicalDisclaimer />
                 </ProtectedRoute>
               } />
               <Route path="*" element={<NotFound />} />
