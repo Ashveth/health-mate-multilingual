@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Globe, Bell, Shield, Save } from 'lucide-react';
+import { User, Globe, Bell, Mic2, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage, languageOptions } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 
 interface UserProfile {
   full_name: string;
@@ -23,6 +25,10 @@ interface UserProfile {
     disease_alerts: boolean;
     appointment_reminders: boolean;
   };
+  voice_input_enabled: boolean;
+  voice_output_enabled: boolean;
+  auto_read_responses: boolean;
+  speech_rate: number;
 }
 
 export default function Settings() {
@@ -35,13 +41,18 @@ export default function Settings() {
       health_tips: true,
       disease_alerts: true,
       appointment_reminders: true
-    }
+    },
+    voice_input_enabled: true,
+    voice_output_enabled: false,
+    auto_read_responses: false,
+    speech_rate: 1.0,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
   const { currentLanguage, setLanguage, t } = useLanguage();
   const { toast } = useToast();
+  const { isSupported: isTTSSupported } = useTextToSpeech();
 
   useEffect(() => {
     if (user) {
@@ -69,7 +80,11 @@ export default function Settings() {
             health_tips: true,
             disease_alerts: true,
             appointment_reminders: true
-          }
+          },
+          voice_input_enabled: data.voice_input_enabled ?? true,
+          voice_output_enabled: data.voice_output_enabled ?? false,
+          auto_read_responses: data.auto_read_responses ?? false,
+          speech_rate: data.speech_rate ?? 1.0,
         });
       }
     } catch (error) {
@@ -95,7 +110,11 @@ export default function Settings() {
           phone_number: profile.phone_number,
           location: profile.location,
           preferred_language: profile.preferred_language,
-          notification_preferences: profile.notification_preferences
+          notification_preferences: profile.notification_preferences,
+          voice_input_enabled: profile.voice_input_enabled,
+          voice_output_enabled: profile.voice_output_enabled,
+          auto_read_responses: profile.auto_read_responses,
+          speech_rate: profile.speech_rate,
         });
 
       if (error) throw error;
@@ -321,6 +340,99 @@ export default function Settings() {
                   checked={profile.notification_preferences.appointment_reminders}
                   onCheckedChange={(checked) => handleNotificationChange('appointment_reminders', checked)}
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Voice & Accessibility Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mic2 className="w-5 h-5" />
+                Voice & Accessibility
+              </CardTitle>
+              <CardDescription>
+                Configure voice input and output for chat
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {!isTTSSupported && (
+                <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-sm text-yellow-700 dark:text-yellow-300">
+                  Voice features may not be fully supported in your browser.
+                </div>
+              )}
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Voice Input</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Enable speech-to-text in chat
+                  </p>
+                </div>
+                <Switch
+                  checked={profile.voice_input_enabled}
+                  onCheckedChange={(checked) =>
+                    setProfile({ ...profile, voice_input_enabled: checked })
+                  }
+                />
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Voice Output</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Enable text-to-speech for responses
+                  </p>
+                </div>
+                <Switch
+                  checked={profile.voice_output_enabled}
+                  onCheckedChange={(checked) =>
+                    setProfile({ ...profile, voice_output_enabled: checked })
+                  }
+                />
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Auto-read Responses</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Automatically read AI responses aloud
+                  </p>
+                </div>
+                <Switch
+                  checked={profile.auto_read_responses}
+                  disabled={!profile.voice_output_enabled}
+                  onCheckedChange={(checked) =>
+                    setProfile({ ...profile, auto_read_responses: checked })
+                  }
+                />
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Speech Rate</Label>
+                  <span className="text-sm text-muted-foreground">{profile.speech_rate.toFixed(1)}x</span>
+                </div>
+                <Slider
+                  value={[profile.speech_rate]}
+                  onValueChange={([value]) =>
+                    setProfile({ ...profile, speech_rate: value })
+                  }
+                  min={0.5}
+                  max={2.0}
+                  step={0.1}
+                  disabled={!profile.voice_output_enabled}
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Slower</span>
+                  <span>Faster</span>
+                </div>
               </div>
             </CardContent>
           </Card>
