@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Mic, Volume2, Bot, User } from "lucide-react";
+import { Send, Mic, Volume2, VolumeX, Bot, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Message {
   id: string;
@@ -17,6 +22,8 @@ interface Message {
 }
 
 export const ChatInterface = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -27,15 +34,67 @@ export const ChatInterface = () => {
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [autoRead, setAutoRead] = useState(false);
+
+  // Load voice preferences from profile
+  useEffect(() => {
+    const loadVoicePreferences = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('voice_output_enabled, auto_read_responses, speech_rate')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (data) {
+        setVoiceEnabled(data.voice_output_enabled || false);
+        setAutoRead(data.auto_read_responses || false);
+      }
+    };
+    
+    loadVoicePreferences();
+  }, [user]);
+
+  // Speech recognition hook
+  const {
+    transcript,
+    isListening,
+    isSupported: isSpeechSupported,
+    startListening,
+    stopListening,
+    resetTranscript,
+  } = useSpeechRecognition({
+    language: 'en-US',
+    continuous: false,
+    interimResults: true,
+  });
+
+  // Text-to-speech hook
+  const {
+    speak,
+    stop: stopSpeaking,
+    isSpeaking,
+    isSupported: isTTSSupported,
+  } = useTextToSpeech({
+    language: 'en-US',
+    rate: 1,
+  });
+
+  // Update input when transcript changes
+  useEffect(() => {
+    if (transcript) {
+      setInputMessage(transcript);
+    }
+  }, [transcript]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
     // Client-side input validation
     if (inputMessage.length > 1000) {
-      const { toast } = await import('@/hooks/use-toast');
       toast({
         title: "Message too long",
         description: "Please keep your message under 1000 characters.",
@@ -43,6 +102,9 @@ export const ChatInterface = () => {
       });
       return;
     }
+
+    // Stop any ongoing speech
+    stopSpeaking();
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -53,6 +115,7 @@ export const ChatInterface = () => {
 
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
+    resetTranscript();
     setIsLoading(true);
 
     try {
@@ -66,6 +129,16 @@ export const ChatInterface = () => {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
+
+      // Auto-read AI response if enabled
+      if (voiceEnabled && autoRead && isTTSSupported) {
+        // Remove markdown formatting for speech
+        const textToSpeak = response
+          .replace(/[#*`]/g, '')
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+          .replace(/\n+/g, '. ');
+        speak(textToSpeak);
+      }
     } catch (error) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -116,8 +189,27 @@ export const ChatInterface = () => {
   };
 
   const toggleListening = () => {
-    setIsListening(!isListening);
-    // Speech-to-text functionality will be implemented here
+    if (!isSpeechSupported) {
+      toast({
+        title: "Not Supported",
+        description: "Speech recognition is not supported in your browser.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  const toggleVoiceOutput = () => {
+    if (isSpeaking) {
+      stopSpeaking();
+    }
+    setVoiceEnabled(!voiceEnabled);
   };
 
   return (
@@ -259,9 +351,17 @@ export const ChatInterface = () => {
           <Button
             variant="outline"
             size="icon"
-            className="flex-shrink-0 hover:bg-accent-light/10 transition-colors"
+            onClick={toggleVoiceOutput}
+            className={`flex-shrink-0 transition-all duration-200 ${
+              voiceEnabled ? 'bg-accent text-accent-foreground shadow-medical' : 'hover:bg-accent-light/10'
+            }`}
+            title={voiceEnabled ? "Voice output enabled" : "Voice output disabled"}
           >
-            <Volume2 className="w-4 h-4" />
+            {voiceEnabled ? (
+              <Volume2 className={`w-4 h-4 ${isSpeaking ? 'animate-pulse' : ''}`} />
+            ) : (
+              <VolumeX className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </div>

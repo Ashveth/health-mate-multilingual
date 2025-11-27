@@ -355,6 +355,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          auto_read_responses: boolean | null
           created_at: string
           full_name: string | null
           id: string
@@ -362,10 +363,14 @@ export type Database = {
           notification_preferences: Json | null
           phone_number: string | null
           preferred_language: string | null
+          speech_rate: number | null
           updated_at: string
           user_id: string
+          voice_input_enabled: boolean | null
+          voice_output_enabled: boolean | null
         }
         Insert: {
+          auto_read_responses?: boolean | null
           created_at?: string
           full_name?: string | null
           id?: string
@@ -373,10 +378,14 @@ export type Database = {
           notification_preferences?: Json | null
           phone_number?: string | null
           preferred_language?: string | null
+          speech_rate?: number | null
           updated_at?: string
           user_id: string
+          voice_input_enabled?: boolean | null
+          voice_output_enabled?: boolean | null
         }
         Update: {
+          auto_read_responses?: boolean | null
           created_at?: string
           full_name?: string | null
           id?: string
@@ -384,8 +393,11 @@ export type Database = {
           notification_preferences?: Json | null
           phone_number?: string | null
           preferred_language?: string | null
+          speech_rate?: number | null
           updated_at?: string
           user_id?: string
+          voice_input_enabled?: boolean | null
+          voice_output_enabled?: boolean | null
         }
         Relationships: []
       }
