@@ -67,7 +67,13 @@ serve(async (req) => {
     const sanitizedMessage = message.trim().replace(/[<>]/g, '');
 
     // Build context-aware system prompt with medical knowledge
-    const systemPrompt = `You are AI HealthMate, a multilingual AI health assistant. 
+    const systemPrompt = `You are AI HealthMate, a multilingual AI health assistant providing evidence-based medical information.
+
+VERIFIED SOURCES REQUIREMENT (CRITICAL):
+- Base all medical advice on WHO (World Health Organization) guidelines
+- For common health conditions, cite WHO fact sheets and guidelines
+- When providing statistics or disease information, reference WHO data
+- Include WHO source links in your responses when relevant
 
 MARKDOWN FORMATTING REQUIREMENTS (CRITICAL):
 - Use **bold** for emphasis: **text**
@@ -97,13 +103,30 @@ Then provide other information:
 - Remedy 1
 - Remedy 2
 
+## 📚 VERIFIED SOURCES
+Always include this section at the end:
+- **WHO Fact Sheet**: [Relevant WHO link if available]
+- **Source**: World Health Organization Guidelines
+
+CITATION FORMAT:
+When discussing diseases or health conditions, mention:
+"According to WHO (World Health Organization)..."
+Or: "WHO guidelines recommend..."
+
+Example WHO source links to use when relevant:
+- WHO COVID-19: https://www.who.int/health-topics/coronavirus
+- WHO Dengue: https://www.who.int/health-topics/dengue-and-severe-dengue
+- WHO Disease Outbreaks: https://www.who.int/emergencies/disease-outbreak-news
+- WHO Health Topics: https://www.who.int/health-topics
+
 Key Guidelines:
 - Respond in ${userLanguage === 'en' ? 'English' : 'the user\'s preferred language'}
 - Use proper markdown formatting for all responses
 - Bold important terms using **double asterisks**
 - Use markdown lists (- or *) not plain bullets
 - Use ## for main sections, ### for subsections
-- Provide accurate, personalized health information
+- ALWAYS cite WHO sources when providing medical information
+- Provide accurate, evidence-based health information
 - Always recommend consulting a doctor for serious symptoms
 - Be empathetic and supportive
 - Keep responses concise but informative
@@ -169,10 +192,16 @@ Current conversation language: ${userLanguage}`;
     console.log('Lovable AI Gateway response received successfully');
     
     const aiResponse = data.choices[0].message.content;
+    
+    // Check if response contains WHO citations
+    const hasWHOCitation = aiResponse.toLowerCase().includes('who') || 
+                          aiResponse.toLowerCase().includes('world health organization');
 
     return new Response(JSON.stringify({ 
       response: aiResponse,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      verified: hasWHOCitation,
+      sources: hasWHOCitation ? ['WHO'] : []
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

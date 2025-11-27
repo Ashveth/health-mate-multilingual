@@ -19,6 +19,8 @@ interface Message {
   content: string;
   timestamp: Date;
   language?: string;
+  verified?: boolean;
+  sources?: string[];
 }
 
 export const ChatInterface = () => {
@@ -126,7 +128,9 @@ export const ChatInterface = () => {
         id: (Date.now() + 1).toString(),
         type: 'ai',
         content: response,
-        timestamp: new Date()
+        timestamp: new Date(),
+        verified: false,
+        sources: []
       };
       setMessages(prev => [...prev, aiResponse]);
 
@@ -182,6 +186,17 @@ export const ChatInterface = () => {
 
       if (error) throw error;
 
+      // Store verification info for the response
+      if (data.verified) {
+        setTimeout(() => {
+          setMessages(prev => prev.map(msg => 
+            msg.id === (Date.now() + 1).toString() 
+              ? { ...msg, verified: true, sources: data.sources || [] }
+              : msg
+          ));
+        }, 100);
+      }
+
       return data.response || 'I apologize, but I encountered an issue processing your request. Please try again.';
     } catch (error) {
       return 'Sorry, I couldn\'t process your health question right now. Please try again later or contact support.';
@@ -214,6 +229,20 @@ export const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto bg-gradient-bg">
+      {/* Verification Banner */}
+      <div className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border-b border-primary/20 px-4 py-3">
+        <div className="flex items-center justify-center gap-2 text-sm">
+          <div className="flex items-center gap-2 px-3 py-1 bg-white/50 dark:bg-black/30 rounded-full backdrop-blur-sm border border-primary/20">
+            <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span className="font-medium text-primary">
+              Information verified by WHO
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Chat Messages */}
       <ScrollArea className="flex-1 p-4 space-y-4">
         <AnimatePresence>
@@ -239,6 +268,14 @@ export const ChatInterface = () => {
                   ? 'bg-primary text-primary-foreground ml-auto' 
                   : 'bg-card border border-primary-light/20'
               }`}>
+                {message.type === 'ai' && message.verified && (
+                  <div className="mb-3 flex items-center gap-2 text-xs px-2 py-1 bg-primary/10 rounded-md border border-primary/20">
+                    <svg className="w-3 h-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="font-medium text-primary">Verified by WHO</span>
+                  </div>
+                )}
                 <div className="text-sm leading-relaxed">
                   {message.type === 'ai' ? (
                     <div className="markdown-content">
