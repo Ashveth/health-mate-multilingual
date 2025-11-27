@@ -1,30 +1,30 @@
 🏥 AI HealthMate – Multilingual Public Health Assistant
 
-AI HealthMate is a full-stack, AI-powered, multilingual public health chatbot that empowers users with reliable, evidence-based health guidance using LLMs, Knowledge Graphs, and WHO-verified information.
-It provides medical assistance, doctor discovery, appointment booking, emergency support, and multilingual communication — all in one seamless platform.
+AI HealthMate is a full-stack, AI-powered public health chatbot that delivers reliable, evidence-based medical assistance using LLMs, Knowledge Graphs, and WHO-verified health data.
+It offers doctor discovery, appointment booking, emergency support, multilingual chat, voice features, dashboards, and more — all in one seamless platform.
 
 🚀 Features
 🤖 AI Health Chatbot
 
 Multilingual responses (10+ Indian languages)
 
-WHO-verified guidance
+WHO-verified medical guidance
 
-Medical Knowledge Graph for disease data
+Medical Knowledge Graph for disease insights
 
-Context-aware conversations (keeps last 10 messages)
+Context-aware conversations (stores last 10 messages)
 
 Markdown-formatted responses
 
-Workflow detection (appointment booking, doctor search, emergency)
+Workflow detection (appointments, doctor search, emergencies)
 
-Safe & validated medical responses
+Safe & validated health responses
 
 🎙️ Voice Features
 
 Speech-to-Text (voice input)
 
-Text-to-Speech (voice output)
+Text-to-Speech (AI voice output)
 
 Auto-read responses
 
@@ -32,27 +32,27 @@ Adjustable TTS speed (0.5× – 2.0×)
 
 🔊 Sound Effects
 
-Message send sound (“whoosh”)
+Message send sound ("whoosh")
 
-Response sound notification
+Response notification sound
 
-Built using Web Audio API (no external assets)
+Powered by Web Audio API (no external assets)
 
 ⏳ Enhanced Typing Indicator
 
 Bouncing dots animation
 
-“AI is typing…” display
+“AI is typing…” label
 
 Smooth Framer Motion transitions
 
 📱 User Interface
 
-Responsive — works on all devices
+Fully responsive
 
-Dark/Light theme support
+Dark/Light mode
 
-Glassmorphism UI
+Glassmorphism elements
 
 Sidebar navigation
 
@@ -62,13 +62,13 @@ Animated splash screen
 
 Geolocation-based search
 
-Manual city/area search
+Manual city/area lookup
 
-Distance calculation using Haversine Formula
+Distance calculation (Haversine Formula)
 
 Doctor profiles (rating, experience, fee)
 
-Secure contact reveal (after valid appointment)
+Secure contact reveal (post-appointment)
 
 Real-time filters
 
@@ -78,57 +78,37 @@ Date & time picker
 
 Doctor-specific booking
 
-Appointment notes
+Notes for appointment
 
-Status states: Scheduled / Completed / Cancelled
+Status: Scheduled / Completed / Cancelled
 
-Appointment history + rescheduling
+Appointment history with rescheduling
 
 🚨 Emergency Services
 
 Quick dial: Ambulance (108), Police (100)
 
-Personal emergency contacts
-
-CRUD for contacts
+Personal emergency contacts (CRUD)
 
 Book appointments with personal doctor
 
 👤 User Profile & Settings
 
-Personal information
+Personal details
 
-Language preferences
+Preferred language
 
-Notifications (tips, alerts, reminders)
+Notification preferences
 
-Voice settings + speech rate slider
+Voice settings + TTS speed slider
 
 🌍 Multilingual Support (10 Languages)
 
-English
-
-Hindi
-
-Tamil
-
-Telugu
-
-Kannada
-
-Bengali
-
-Marathi
-
-Gujarati
-
-Malayalam
-
-Punjabi
+English, Hindi, Tamil, Telugu, Kannada, Bengali, Marathi, Gujarati, Malayalam, Punjabi
 
 🔐 Authentication & Security
 
-Email/Password auth
+Email/Password login
 
 Google OAuth
 
@@ -142,95 +122,66 @@ API rate limiting
 
 📊 Health Dashboard
 
-Health statistics
+Health insights
 
 Featured doctors
 
 Daily health tips
 
-Outbreak alerts (WHO-sourced)
+WHO outbreak alerts
 
-Emergency quick access
+Quick emergency tools
 
 📋 Medical Disclaimer
 
-Data sources (WHO, CDC, medical journals)
+WHO, CDC, and medical journal sources
 
-Verification process
+Explanation of verification process
 
-AI limitations & safety warnings
+Limitations of AI medical advice
 
-Terms of use
+Terms & usage guidelines
 
 🛠️ Tech Stack
 Frontend
-Technology	Version	Purpose
-React	18.3.1	UI Framework
-TypeScript	5.8.3	Type-safe development
-Vite	5.4.19	Build tooling
-TailwindCSS	3.4.17	Styling
-Framer Motion	12.23.16	Animations
-React Router DOM	6.30.1	Routing
-TanStack React Query	5.83.0	Server state
+
+React • TypeScript • Vite • TailwindCSS • Framer Motion • React Router DOM • TanStack React Query
 
 UI & Components
 
-Radix UI
-
-shadcn/ui
-
-Lucide Icons
-
-Recharts
-
-Embla Carousel
-
-Sonner Toasts
-
-class-variance-authority
-
-tailwind-merge
+Radix UI • shadcn/ui • Lucide Icons • Recharts • Embla Carousel • Sonner Toasts • class-variance-authority • tailwind-merge
 
 Backend & Database
-Technology	Purpose
-Lovable Cloud (Supabase)	Backend
-PostgreSQL	Database
-Supabase Auth	Authentication
-Edge Functions	Serverless logic
-RLS Policies	Data access control
+
+Lovable Cloud (Supabase) • PostgreSQL • Supabase Auth • Edge Functions • RLS Policies
+
 AI & NLP
-Technology	Purpose
-Google Gemini 2.5 Flash	Primary AI model
-Lovable AI Gateway	Model management
-Medical Knowledge Graph	Structured medical data
-WHO Guidelines	Verified medical information
+
+Google Gemini 2.5 Flash • Lovable AI Gateway • Medical Knowledge Graph • WHO Guidelines
+
 Forms & Validation
 
-React Hook Form
-
-Zod
-
-@hookform/resolvers
+React Hook Form • Zod • @hookform/resolvers
 
 Utilities
 
-date-fns
-
-React Markdown
-
-cmdk
-
-react-day-picker
+date-fns • React Markdown • cmdk • react-day-picker
 
 🗄️ Database Schema
 Tables
-Table	Purpose
-profiles	User profiles
-doctors	Doctor listings
-appointments	Bookings
-emergency_contacts	Emergency contacts
-health_alerts	WHO outbreak data
-doctor_contact_access_log	Access audits
+
+profiles — User profiles
+
+doctors — Doctor listings
+
+appointments — Appointment records
+
+emergency_contacts — User emergency contacts
+
+health_alerts — WHO outbreak data
+
+doctor_contact_access_log — Audit log for doctor contact access
+
 Functions
 
 handle_new_user()
@@ -244,11 +195,11 @@ log_doctor_contact_access()
 🌐 Edge Functions
 chat-with-claude
 
-Chat response generation
+Generates chat responses
 
 WHO integration
 
-Knowledge graph
+Medical knowledge graph
 
 Input validation
 
@@ -256,9 +207,12 @@ Rate limiting
 
 update-health-alerts
 
-Fetches & updates disease outbreak data
+Fetches latest WHO outbreak data
 
-📁 Project Structure
+Updates database 
+
+📁 Project Structure 
+
 src/
 ├── components/
 │   ├── ui/
@@ -296,23 +250,22 @@ src/
 │       ├── client.ts
 │       └── types.ts
 └── assets/
-
 🚀 App Routes
 Route	Page	Auth
 /	Dashboard	✅
 /chat	AI Chat	✅
-/auth	Sign in / Sign up	❌
-/profile	User profile	✅
-/doctors	Find doctors	✅
+/auth	Sign In / Sign Up	❌
+/profile	User Profile	✅
+/doctors	Find Doctors	✅
 /appointments	Appointments	✅
 /emergency	Emergency	✅
 /settings	Settings	✅
-/disclaimer	Medical disclaimer	✅
+/disclaimer	Medical Disclaimer	✅
 🔗 Live Links
 
-🌐 Web App: https://health-mate-multilingual.vercel.app/
+🌐 Web App : https://health-mate-multilingual.vercel.app/
 
-▶️ Demo Video : https://youtu.be/MvbbQbFw0ak?si=QsVcm2PKWu6rjBqf 
+▶️ Demo Video : https://youtu.be/MvbbQbFw0ak?si=_QkAmXsZZ1vbuR7x
 
 📜 License
 
