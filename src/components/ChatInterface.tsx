@@ -231,7 +231,7 @@ export const ChatInterface = () => {
     <div className="flex flex-col h-full max-w-4xl mx-auto bg-gradient-bg">
       {/* Verification Banner */}
       <div className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border-b border-primary/20 px-4 py-3">
-        <div className="flex items-center justify-center gap-2 text-sm">
+        <div className="flex items-center justify-center gap-3 text-sm flex-wrap">
           <div className="flex items-center gap-2 px-3 py-1 bg-white/50 dark:bg-black/30 rounded-full backdrop-blur-sm border border-primary/20">
             <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -240,6 +240,12 @@ export const ChatInterface = () => {
               Information verified by WHO
             </span>
           </div>
+          <button 
+            onClick={() => window.location.href = '/disclaimer'}
+            className="text-xs text-muted-foreground hover:text-primary underline transition-colors"
+          >
+            View Medical Disclaimer
+          </button>
         </div>
       </div>
 

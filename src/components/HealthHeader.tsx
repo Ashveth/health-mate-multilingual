@@ -91,6 +91,9 @@ export const HealthHeader = () => {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => navigate('/profile')}>Profile</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/settings')}>Settings</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/disclaimer')}>
+                  Medical Disclaimer
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
                   toast({
                     title: "Help & Support",
