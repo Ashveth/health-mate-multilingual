@@ -310,11 +310,9 @@ Route	Page	Auth
 /disclaimer	Medical disclaimer	✅
 🔗 Live Links
 
-🌐 Web App: w
+🌐 Web App: https://health-mate-multilingual.vercel.app/
 
-📱 Android App: Google Drive link
-
-▶️ Demo Video: YouTube link
+▶️ Demo Video: 
 
 📜 License
 
