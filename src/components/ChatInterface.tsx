@@ -30,7 +30,7 @@ export const ChatInterface = () => {
     {
       id: '1',
       type: 'ai',
-      content: 'Hello! I\'m AI HealthMate, your Public Health Assistant. 🏥\n\nI can help you with:\n• 📅 **Book appointments** - "Book appointment with cardiologist"\n• 🔍 **Find doctors** - "Find pediatrician near me"\n• 🚨 **Emergency help** - "Emergency" or "Ambulance"\n• 💬 **Health questions** - Ask about symptoms, treatments, wellness\n\nHow can I assist you today? (मैं आपकी कैसे सहायता कर सकता हूं?)',
+      content: 'Hello! I\'m AI HealthMate, your Public Health Assistant. 🏥\n\nI can help you with:\n\n- 📅 **Book appointments** — "Book appointment with cardiologist"\n- 🔍 **Find doctors** — "Find pediatrician near me"\n- 🚨 **Emergency help** — "Emergency" or "Ambulance"\n- 💬 **Health questions** — Ask about symptoms, treatments, wellness\n\nHow can I assist you today?\n\n(मैं आपकी कैसे सहायता कर सकता हूं?)',
       timestamp: new Date(),
       language: 'en-hi'
     }
@@ -288,8 +288,8 @@ export const ChatInterface = () => {
                       <ReactMarkdown 
                         components={{
                           p: ({children}) => <p className="mb-2">{children}</p>,
-                          ul: ({children}) => <ul className="space-y-1 mb-2">{children}</ul>,
-                          li: ({children}) => <li className="flex items-start"><span className="text-primary mr-2 mt-1">•</span><span className="flex-1">{children}</span></li>,
+                          ul: ({children}) => <ul className="space-y-2 mb-3 pl-1">{children}</ul>,
+                          li: ({children}) => <li className="flex items-start gap-2"><span className="text-primary font-bold mt-0.5 flex-shrink-0">•</span><span className="flex-1 leading-relaxed">{children}</span></li>,
                           strong: ({children}) => <strong className="font-semibold text-foreground">{children}</strong>,
                           h1: ({children}) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
                           h2: ({children}) => <h2 className="text-base font-bold mb-2">{children}</h2>,
