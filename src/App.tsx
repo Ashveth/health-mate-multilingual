@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import FindDoctors from "./pages/FindDoctors";
 import Appointments from "./pages/Appointments";
 import Emergency from "./pages/Emergency";
@@ -34,6 +35,11 @@ const App = () => (
               <Route path="/chat" element={
                 <ProtectedRoute>
                   <Index />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               } />
               <Route path="/doctors" element={
