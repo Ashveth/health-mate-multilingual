@@ -208,9 +208,10 @@ Current conversation language: ${userLanguage}`;
 
   } catch (error) {
     console.error('Error in chat-with-claude function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(JSON.stringify({ 
       error: 'Failed to get AI response. Please try again.',
-      details: error.message 
+      details: errorMessage 
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
